@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6f8fb">
+  <meta name="description" content="物件価格・頭金・住宅ローン金利・管理費・修繕積立金・諸費用から、実際の住居費を試算する無料シミュレーター。">
+  <title>住まいのお金シミュレーター | 住宅ローンと月額負担</title>
+  <style>
+    :root { --bg:#f5f7fb; --paper:#ffffff; --ink:#18283c; --sub:#5c6e80; --muted:#8190a0; --border:#e2e8f0; --brand:#176d75; --brand-dark:#0e5259; --brand-light:#e6f5f2; --blue:#5166b4; --amber:#b9792c; --red:#b54e49; --teal:#13a0a0; --shadow:0 12px 35px rgba(24,40,60,.06); }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { margin:0; font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic", Meiryo, system-ui, sans-serif; background:var(--bg); color:var(--ink); -webkit-font-smoothing:antialiased; font-size:14px; line-height:1.65; }
+    body::before { content:""; position:absolute; inset:0 0 auto; height:500px; pointer-events:none; background:radial-gradient(ellipse at 83% 8%, rgba(45,176,162,.11), transparent 45%), radial-gradient(ellipse at 15% 1%, rgba(115,136,230,.09), transparent 45%); }
+    button, input, select { font:inherit; }
+    button { cursor:pointer; }
+    button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible, summary:focus-visible { outline:3px solid rgba(23,109,117,.34); outline-offset:2px; }
+    a { color:var(--brand); }
+    .wrap { width:min(1340px,calc(100% - 64px)); margin:auto; position:relative; }
+    .site-header { position:relative; border-bottom:1px solid rgba(215,224,233,.75); background:rgba(255,255,255,.7); backdrop-filter:blur(16px); }
+    .topbar { min-height:72px; display:flex; justify-content:space-between; align-items:center; gap:20px; }
+    .brand { display:flex; align-items:center; gap:11px; font-size:15px; font-weight:800; letter-spacing:.01em; color:#183d48; text-decoration:none; }
+    .brandmark { display:grid; place-items:center; width:36px; height:36px; color:white; background:linear-gradient(145deg,#1f8c88,#12546a); border-radius:11px; box-shadow:0 5px 13px #14576435; }
+    .header-right { display:flex; align-items:center; gap:13px; }
+    .privately { display:inline-flex; align-items:center; gap:6px; color:var(--sub); font-size:12px; }
+    .privately::before { content:""; display:inline-block; background:#28a781; height:7px; width:7px; border-radius:50%; }
+    .mini-action { border:1px solid var(--border); background:#fff; border-radius:10px; padding:9px 13px; color:var(--ink); font-size:12px; font-weight:700; transition:.15s; }
+    .mini-action:hover { border-color:#adcacb; background:#f7fbfb; }
+    .intro { padding:34px 0 29px; }
+    .eyebrow { display:flex; align-items:center; gap:9px; color:var(--brand); font-size:11px; font-weight:800; letter-spacing:.12em; }
+    .eyebrow .line { width:25px; height:1px; background:#91c4c5; }
+    .intro h1 { font-size:clamp(27px,3.1vw,42px); font-weight:850; line-height:1.35; letter-spacing:-.055em; margin:8px 0 10px; }
+    .intro h1 em { color:var(--brand); font-style:normal; }
+    .intro p { max-width:730px; color:var(--sub); margin:0; font-size:13.5px; }
+    .layout { display:grid; grid-template-columns:minmax(335px,460px) minmax(0,1fr); gap:24px; align-items:start; padding-bottom:70px; }
+    .input-stack { display:flex; flex-direction:column; gap:15px; }
+    .card { background:var(--paper); border:1px solid var(--border); box-shadow:var(--shadow); border-radius:17px; }
+    .panel-title { display:flex; justify-content:space-between; align-items:center; padding:20px 22px 15px; gap:10px; }
+    .panel-title h2 { margin:0; font-size:17px; letter-spacing:-.03em; }
+    .panel-title small { color:var(--muted); font-size:11px; }
+    .section-card { overflow:hidden; }
+    details.section-card summary { cursor:pointer; padding:18px 21px; display:flex; gap:11px; align-items:center; user-select:none; list-style:none; }
+    details.section-card summary::-webkit-details-marker { display:none; }
+    .step { display:grid; place-items:center; flex:none; width:29px; height:29px; border-radius:10px; font-weight:800; color:var(--brand); background:var(--brand-light); font-size:12px; }
+    .sec-label { flex:1; display:flex; flex-direction:column; gap:2px; }
+    .sec-label b { font-size:14px; letter-spacing:-.02em; }
+    .sec-label span { font-size:11px; color:var(--muted); line-height:1.3; }
+    .chevron { color:#91a1ad; transform:rotate(0); transition:transform .2s; }
+    details[open] .chevron { transform:rotate(180deg); }
+    .sec-content { padding:0 21px 22px; border-top:1px solid #eef2f5; }
+    .sec-content > .hint:first-child { margin-top:14px; }
+    .fields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px 11px; margin-top:18px; }
+    .field { min-width:0; }
+    .field.wide { grid-column:1/-1; }
+    .field label { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:2px; margin:0 0 6px; color:#3e5063; font-size:11.5px; font-weight:700; }
+    .optional { color:var(--muted); font-size:10px; font-weight:500; }
+    .input-wrap { display:flex; align-items:center; border:1px solid #dbe3e9; border-radius:9px; background:#fff; overflow:hidden; transition:box-shadow .15s,border-color .15s; }
+    .input-wrap:focus-within { border-color:#489c9e; box-shadow:0 0 0 3px rgba(20,128,132,.10); }
+    input[type=number] { appearance:textfield; -moz-appearance:textfield; color:var(--ink); border:0; width:100%; min-width:0; padding:9px 11px; outline:0; background:transparent; font-size:15px; font-variant-numeric:tabular-nums; font-weight:750; }
+    input::-webkit-inner-spin-button, input::-webkit-outer-spin-button { -webkit-appearance:none; margin:0; }
+    .unit { flex:none; color:#6c7c89; font-size:11px; padding:0 11px 0 5px; }
+    select { background:#fff; color:var(--ink); border:1px solid #dbe3e9; border-radius:9px; width:100%; min-width:0; height:40px; padding:7px 10px; font-size:12.5px; font-weight:700; }
+    .field-hint { display:block; margin-top:5px; font-size:10.5px; line-height:1.5; color:var(--muted); }
+    .segment { padding:3px; background:#f1f5f8; border-radius:11px; display:grid; grid-template-columns:repeat(2,1fr); gap:4px; }
+    .segment button { padding:9px 7px; border:0; background:transparent; color:var(--sub); font-weight:750; border-radius:8px; font-size:12px; }
+    .segment button.active { background:white; color:var(--brand-dark); box-shadow:0 2px 8px #102b3a16; }
+    .formula-note { display:flex; gap:7px; align-items:flex-start; font-size:11px; color:#5a7782; background:#f1f8f8; border-radius:10px; padding:10px 12px; margin-top:14px; line-height:1.65; }
+    .formula-note .notice-dot { color:#1a8186; font-weight:bold; flex:none; }
+    .hint { margin:10px 0 0; color:var(--muted); font-size:11px; }
+    .checkline { display:flex; gap:9px; align-items:flex-start; margin:14px 0 0; cursor:pointer; color:#385161; font-size:12px; }
+    .checkline input { flex:none; width:16px; height:16px; margin:2px 0; accent-color:var(--brand); }
+    .dividing { margin:17px 0; border:0; border-top:1px solid #edf1f4; }
+    .block-label { font-size:12px; font-weight:750; color:#465a69; margin-top:18px; }
+    .calced { display:flex; gap:10px; justify-content:space-between; align-items:center; background:#f5f8fb; border:1px solid #e8edf2; border-radius:10px; padding:11px 12px; margin-top:14px; font-size:12px; }
+    .calced span { color:var(--sub); }
+    .calced strong { font-size:16px; font-variant-numeric:tabular-nums; }
+    .is-hidden { display:none !important; }
+    .results { position:sticky; top:18px; display:flex; flex-direction:column; gap:16px; min-width:0; }
+    .results-head { display:flex; justify-content:space-between; align-items:baseline; padding:0 2px; }
+    .results-head h2 { font-size:16px; margin:0; letter-spacing:-.025em; }
+    .results-head .meta { color:var(--muted); font-size:11px; }
+    .hero-result { position:relative; overflow:hidden; background:linear-gradient(118deg,#123d50 0%,#0d6170 92%); color:white; border-radius:19px; padding:25px 29px 24px; box-shadow:0 14px 30px rgba(17,73,88,.19); }
+    .hero-result:after { content:""; position:absolute; width:300px; height:300px; border-radius:50%; border:1px solid #ffffff22; top:-210px; right:-65px; box-shadow:0 0 0 42px #ffffff07,0 0 0 88px #ffffff05; pointer-events:none; }
+    .result-kicker { position:relative; z-index:1; font-size:12px; font-weight:720; color:#c9e6e9; }
+    .big-number { position:relative; z-index:1; font-size:clamp(37px,4.0vw,56px); font-weight:800; letter-spacing:-.07em; font-variant-numeric:tabular-nums; line-height:1.2; margin:10px 0 7px; }
+    .big-number span { font-size:16px; letter-spacing:0; margin-left:8px; color:#d5e6e9; font-weight:600; }
+    .exact { position:relative; z-index:1; font-size:12px; color:#c4e1e5; }
+    .result-tag { display:inline-flex; position:relative; z-index:1; padding:4px 9px; margin-top:12px; border:1px solid #ffffff45; border-radius:50px; font-size:11px; color:#d7ebed; }
+    .two-summary { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+    .metric { background:#fff; border:1px solid var(--border); border-radius:14px; padding:15px 17px 14px; }
+    .metric .metric-label { color:var(--sub); font-size:11px; }
+    .metric strong { display:block; font-size:22px; letter-spacing:-.04em; margin-top:1px; font-variant-numeric:tabular-nums; }
+    .metric .metric-sub { color:var(--muted); font-size:10.5px; }
+    .details-card { padding:20px 23px; }
+    .details-head { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:8px; }
+    .details-head h3 { margin:0; font-size:14px; font-weight:800; letter-spacing:-.015em; }
+    .details-head span { color:var(--muted); font-size:10.5px; }
+    .total-line { display:flex; justify-content:space-between; align-items:baseline; gap:10px; margin:15px 0 8px; }
+    .total-line .lbl { font-size:12px; color:var(--sub); }
+    .total-line strong { font-size:19px; font-variant-numeric:tabular-nums; }
+    .bar { display:flex; height:12px; gap:2px; overflow:hidden; border-radius:100px; background:#eaf0f3; margin:11px 0 17px; }
+    .bar > div { min-width:0; transition:width .28s; }
+    .legends { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px 8px; }
+    .legend { display:flex; align-items:flex-start; gap:8px; min-width:0; }
+    .swatch { width:9px; height:9px; border-radius:3px; margin-top:5px; flex:none; }
+    .legend span { display:block; color:var(--sub); font-size:10.5px; }
+    .legend strong { display:block; font-size:12px; font-variant-numeric:tabular-nums; }
+    .chart-card { padding:20px 20px 14px; }
+    .chart-card .details-head { padding:0 3px; }
+    .chart-tabs { display:flex; background:#f1f5f7; border-radius:9px; padding:3px; gap:3px; }
+    .chart-tabs button { border:0; border-radius:7px; padding:5px 9px; background:transparent; color:#657785; font-size:11px; font-weight:730; }
+    .chart-tabs button.active { background:#fff; color:var(--brand-dark); box-shadow:0 1px 5px #122c421c; }
+    #mainChart { width:100%; height:auto; display:block; margin-top:14px; overflow:visible; }
+    .chart-bottom { display:flex; justify-content:space-between; color:var(--muted); font-size:10px; padding:0 9px 2px; }
+    .table-card { padding:19px 20px 14px; }
+    .table-scroll { overflow-x:auto; margin-top:14px; }
+    table { width:100%; border-collapse:collapse; white-space:nowrap; font-size:11.5px; font-variant-numeric:tabular-nums; }
+    th { color:#718191; text-align:right; font-weight:700; background:#f6f8fa; padding:10px 8px; }
+    th:first-child, td:first-child { text-align:left; }
+    td { text-align:right; color:#34495b; padding:10px 8px; border-bottom:1px solid #edf0f3; }
+    tr:last-child td { border-bottom:none; }
+    tbody tr:hover { background:#f8fafb; }
+    .comparison { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:16px; }
+    .comparison > div { border:1px solid #e6ecf0; border-radius:12px; padding:13px 14px; background:#fbfcfd; }
+    .comparison .type { display:flex; align-items:center; gap:7px; font-size:11.5px; font-weight:800; }
+    .comparison .type i { width:8px; height:8px; border-radius:3px; }
+    .comparison .c-big { font-size:19px; font-weight:800; margin-top:5px; font-variant-numeric:tabular-nums; }
+    .comparison .c-sub { font-size:10.5px; color:var(--sub); }
+    .comparison .c-foot { border-top:1px solid #e9edf1; padding-top:8px; margin-top:9px; font-size:10.5px; display:flex; justify-content:space-between; gap:5px; }
+    .explain { font-size:11px; color:var(--sub); margin:10px 0 0; line-height:1.7; }
+    .alert { border:1px solid #f0d5b5; background:#fff8ef; color:#8c5524; border-radius:11px; padding:11px 13px; margin-top:12px; font-size:11px; line-height:1.7; }
+    .actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:16px; }
+    .btn { border-radius:10px; border:1px solid #d9e4e7; background:#fff; font-size:11.5px; font-weight:800; color:#2a5961; padding:10px 14px; display:inline-flex; justify-content:center; align-items:center; gap:7px; transition:.15s; }
+    .btn:hover { background:#eff8f7; border-color:#acd5d5; }
+    .btn.primary { background:var(--brand); border-color:var(--brand); color:#fff; }
+    .btn.primary:hover { background:#0e555e; }
+    .assumptions { font-size:11px; line-height:1.8; color:#657584; padding:0 4px; }
+    .assumptions b { color:#455a68; }
+    .assumptions p { margin:5px 0; }
+    .error { display:none; border:1px solid #e9c1c1; background:#fff2f1; padding:12px 14px; border-radius:10px; color:#a63f3b; font-size:12px; }
+    .error.show { display:block; }
+    footer { padding:24px 0 42px; border-top:1px solid #e4eaef; color:#788895; text-align:center; font-size:11px; position:relative; }
+    footer a { text-decoration:underline; text-underline-offset:3px; }
+    .toast { position:fixed; left:50%; bottom:24px; z-index:10; transform:translate(-50%,20px); opacity:0; pointer-events:none; background:#203e4c; color:white; padding:11px 17px; border-radius:11px; font-size:12px; box-shadow:0 15px 28px #1a3d4e40; transition:opacity .2s,transform .2s; max-width:calc(100vw - 30px); text-align:center; }
+    .toast.show { opacity:1; transform:translate(-50%,0); }
+    .noscript { padding:20px; background:#fff1e7; color:#82440e; border-radius:10px; margin-bottom:20px; }
+    @media(max-width:1080px) { .wrap { width:min(980px,calc(100% - 34px)); } .layout { grid-template-columns:minmax(300px,.9fr) minmax(0,1.1fr); gap:15px; } .results { top:8px; } .big-number { font-size:clamp(35px,4vw,48px); } .hero-result { padding:22px; } .details-card,.chart-card,.table-card { padding:17px; } }
+    @media(max-width:790px) { .layout { grid-template-columns:minmax(0,1fr); gap:20px; } .results { position:static; } .input-stack { order:0; } .results { order:1; } .intro { padding:25px 0 20px; } .header-right .privately { display:none; } .big-number { font-size:46px; } }
+    @media(max-width:480px) { .wrap { width:calc(100% - 26px); } .topbar { min-height:64px; } .brand { font-size:13px; gap:8px; } .brandmark { width:31px; height:31px; } .header-right { gap:5px; } .mini-action { padding:8px; font-size:11px; } .intro h1 { font-size:29px; } .intro p { font-size:12px; } .fields { column-gap:9px; } details.section-card summary { padding:16px; } .sec-content { padding:0 16px 18px; } .big-number { font-size:39px; } .hero-result { padding:20px; } .two-summary { gap:8px; } .metric { padding:12px; } .metric strong { font-size:20px; } .details-card,.chart-card,.table-card { padding:16px; } .comparison { gap:8px; } .comparison > div { padding:10px; } .comparison .c-big { font-size:17px; } .actions .btn { flex:1; } }
+    @media print { body { background:white; } .site-header,.input-stack,.actions,.chart-tabs,footer { display:none!important; } .layout { display:block; } .results { position:static; } .card,.hero-result { box-shadow:none; } .wrap { width:100%; } .hero-result { print-color-adjust:exact; -webkit-print-color-adjust:exact; } }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap topbar">
+      <a href="#top" class="brand" aria-label="住まいのお金シミュレーターのトップ">
+        <span class="brandmark"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m3 11 9-7 9 7M5.5 10.5V20h13v-9.5M9.5 20v-7h5v7" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/></svg></span>
+        <span>住まいのお金 <span style="font-weight:500;color:#70808c">/ SIMULATOR</span></span>
+      </a>
+      <div class="header-right"><span class="privately">入力内容はサーバーに送信されません</span><button id="resetBtn" class="mini-action" type="button">初期値に戻す</button></div>
+    </div>
+  </header>
+  <main id="top" class="wrap">
+    <div class="intro">
+      <div class="eyebrow"><span class="line"></span> HOME FINANCE PLANNER <span class="line"></span></div>
+      <h1>その家、<em>毎月いくら</em>かかる？</h1>
+      <p>物件価格だけでは見えない「本当の住居費」を可視化。頭金、住宅ローン、管理費・修繕積立金、税金、購入時の諸費用までまとめて試算できます。</p>
+    </div>
+    <noscript><div class="noscript">このツールにはJavaScriptが必要です。ブラウザのJavaScriptを有効にしてください。</div></noscript>
+    <div class="layout">
+      <div class="input-stack" id="inputs">
+        <div class="panel-title" style="padding:0 3px"><h2>シミュレーション条件</h2><small>数値を変更すると自動計算</small></div>
+        <details class="card section-card" open>
+          <summary><span class="step">01</span><span class="sec-label"><b>物件価格と頭金</b><span>購入する物件と自己資金を設定</span></span><svg class="chevron" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></summary>
+          <div class="sec-content">
+            <div class="fields">
+              <div class="field wide"><label for="propertyType">物件種別</label><div class="segment" id="propertySegment" role="group" aria-label="物件種別"><button type="button" data-property="condo" class="active" aria-pressed="true">マンション</button><button type="button" data-property="house" aria-pressed="false">戸建て</button></div><input id="propertyType" type="hidden" data-field value="condo"><span class="field-hint">切り替えると維持費の参考初期値が変わります。</span></div>
+              <div class="field"><label for="price">物件価格</label><div class="input-wrap"><input id="price" type="number" data-field min="1" max="100000" step="10" value="6500"><span class="unit">万円</span></div></div>
+              <div class="field"><label for="down">頭金</label><div class="input-wrap"><input id="down" type="number" data-field min="0" max="100000" step="10" value="1000"><span class="unit">万円</span></div></div>
+            </div>
+            <div class="calced"><span>物件代金に対する頭金比率</span><strong id="downRatio">15.4%</strong></div>
+          </div>
+        </details>
+        <details class="card section-card" open>
+          <summary><span class="step">02</span><span class="sec-label"><b>住宅ローン</b><span>金利タイプ・返済期間・返済方式</span></span><svg class="chevron" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></summary>
+          <div class="sec-content">
+            <div class="fields">
+              <div class="field wide"><label for="interestType">金利タイプ</label><select id="interestType" data-field><option value="variable" selected>変動金利</option><option value="fixed">全期間固定金利</option><option value="intro">当初固定 → 期間終了後は指定金利</option></select></div>
+              <div class="field"><label for="term">返済期間</label><div class="input-wrap"><input id="term" type="number" data-field min="1" max="50" step="1" value="35"><span class="unit">年</span></div></div>
+              <div class="field"><label for="repayment">返済方法</label><select id="repayment" data-field><option value="equal">元利均等返済</option><option value="principal">元金均等返済</option></select></div>
+              <div class="field rate-field" data-show="variable"><label for="rateVariable">変動金利（初期）</label><div class="input-wrap"><input id="rateVariable" type="number" data-field min="0" max="30" step="0.05" value="0.85"><span class="unit">% / 年</span></div></div>
+              <div class="field rate-field is-hidden" data-show="fixed"><label for="rateFixed">全期間固定金利</label><div class="input-wrap"><input id="rateFixed" type="number" data-field min="0" max="30" step="0.05" value="2.00"><span class="unit">% / 年</span></div></div>
+              <div class="field rate-field is-hidden" data-show="intro"><label for="rateIntro">当初固定金利</label><div class="input-wrap"><input id="rateIntro" type="number" data-field min="0" max="30" step="0.05" value="1.40"><span class="unit">% / 年</span></div></div>
+              <div class="field is-hidden" data-show="intro"><label for="introYears">当初固定の期間</label><div class="input-wrap"><input id="introYears" type="number" data-field min="1" max="50" step="1" value="10"><span class="unit">年</span></div></div>
+              <div class="field is-hidden" data-show="intro"><label for="postRate">期間終了後の想定金利</label><div class="input-wrap"><input id="postRate" type="number" data-field min="0" max="30" step="0.05" value="2.40"><span class="unit">% / 年</span></div></div>
+            </div>
+            <div class="formula-note"><span class="notice-dot">ⓘ</span><span>金利は例示用の仮入力値です。金融機関の実際の適用金利、団信の金利上乗せなどを反映して変更してください。</span></div>
+          </div>
+        </details>
+        <details class="card section-card" id="interestSettings" open>
+          <summary><span class="step">03</span><span class="sec-label"><b>変動金利のシナリオ</b><span>金利上昇の時期と幅を設定</span></span><svg class="chevron" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></summary>
+          <div class="sec-content">
+            <p class="hint">「3年後から、毎年0.25%ポイント上昇」などの仮定を試せます。実際の金利予測ではありません。</p>
+            <div class="fields">
+              <div class="field"><label for="riseYear">上昇開始</label><div class="input-wrap"><input id="riseYear" type="number" data-field min="0" max="50" step="1" value="3"><span class="unit">年後</span></div></div>
+              <div class="field"><label for="riseStep">毎年の変化幅</label><div class="input-wrap"><input id="riseStep" type="number" data-field min="-5" max="10" step="0.05" value="0.25"><span class="unit">%pt</span></div></div>
+              <div class="field"><label for="riseCap">想定する上限金利</label><div class="input-wrap"><input id="riseCap" type="number" data-field min="0" max="30" step="0.05" value="3.50"><span class="unit">%</span></div></div>
+            </div>
+            <label class="checkline"><input type="checkbox" id="fiveYearRule" data-field><span><b>5年ルール・125%ルールを適用する</b><br><span style="color:#82909b;font-size:10.5px">元利均等返済でのみ選択可。金利は変わっても5年ごとに返済額を見直し、増額は前回の125%までとする近似計算です。</span></span></label>
+            <div class="formula-note"><span class="notice-dot">ⓘ</span><span>このルールを採用しない銀行もあります。未払利息や満期残高が発生した場合は、最終回に精算する前提で表示します。</span></div>
+          </div>
+        </details>
+        <details class="card section-card" open>
+          <summary><span class="step">04</span><span class="sec-label"><b>購入時の諸費用</b><span>ローン手数料・登記・仲介・引越し等</span></span><svg class="chevron" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></summary>
+          <div class="sec-content">
+            <div class="fields">
+              <div class="field"><label for="purchaseFeePct">物件関連の諸費用</label><div class="input-wrap"><input id="purchaseFeePct" type="number" data-field min="0" max="30" step="0.1" value="4"><span class="unit">物件価格の%</span></div><span class="field-hint">仲介手数料・登記・税・印紙などの合計概算</span></div>
+              <div class="field"><label for="loanFeePct">ローン事務手数料</label><div class="input-wrap"><input id="loanFeePct" type="number" data-field min="0" max="20" step="0.1" value="2.2"><span class="unit">借入額の%</span></div><span class="field-hint">上の物件諸費用と重複しないように入力</span></div>
+              <div class="field"><label for="loanFeeFixed">ローン固定費・保証料等</label><div class="input-wrap"><input id="loanFeeFixed" type="number" data-field min="0" max="10000" step="1" value="0"><span class="unit">万円</span></div></div>
+              <div class="field"><label for="movingCost">引越し・家具等</label><div class="input-wrap"><input id="movingCost" type="number" data-field min="0" max="10000" step="5" value="50"><span class="unit">万円</span></div></div>
+            </div>
+            <label class="checkline"><input type="checkbox" id="financeFees" data-field><span><b>物件・ローンの諸費用を借入額に含める</b><br><span style="color:#82909b;font-size:10.5px">融資対象になると仮定した計算。引越し・家具代は借りずに現金払い。</span></span></label>
+            <div class="calced"><span>購入時の諸費用概算（引越し含む）</span><strong id="feesPreview">—</strong></div>
+          </div>
+        </details>
+        <details class="card section-card" open>
+          <summary><span class="step">05</span><span class="sec-label"><b>毎月・毎年の維持費</b><span>管理費、修繕積立、固定資産税、保険等</span></span><svg class="chevron" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></summary>
+          <div class="sec-content">
+            <div class="fields">
+              <div class="field"><label for="management">管理費</label><div class="input-wrap"><input id="management" type="number" data-field min="0" max="1000000" step="500" value="15000"><span class="unit">円/月</span></div></div>
+              <div class="field"><label for="repairFund">修繕積立金</label><div class="input-wrap"><input id="repairFund" type="number" data-field min="0" max="1000000" step="500" value="18000"><span class="unit">円/月</span></div></div>
+              <div class="field"><label for="parking">駐車場・駐輪場</label><div class="input-wrap"><input id="parking" type="number" data-field min="0" max="1000000" step="500" value="0"><span class="unit">円/月</span></div></div>
+              <div class="field"><label for="selfRepair">自宅設備の修繕積立</label><div class="input-wrap"><input id="selfRepair" type="number" data-field min="0" max="1000000" step="500" value="5000"><span class="unit">円/月</span></div><span class="field-hint">給湯器・内装、戸建ての屋根などに備える任意の貯蓄</span></div>
+              <div class="field"><label for="annualTax">固定資産税・都市計画税</label><div class="input-wrap"><input id="annualTax" type="number" data-field min="0" max="10000" step="1" value="18"><span class="unit">万円/年</span></div></div>
+              <div class="field"><label for="annualIns">火災・地震保険</label><div class="input-wrap"><input id="annualIns" type="number" data-field min="0" max="10000" step="0.5" value="3"><span class="unit">万円/年</span></div></div>
+              <div class="field wide"><label for="miscMonthly">その他の毎月費用</label><div class="input-wrap"><input id="miscMonthly" type="number" data-field min="0" max="1000000" step="500" value="0"><span class="unit">円/月</span></div></div>
+            </div>
+            <hr class="dividing"><div class="block-label">将来の維持費上昇（年1回複利で試算）</div>
+            <div class="fields" style="margin-top:9px">
+              <div class="field"><label for="repairRise">修繕積立金の上昇率</label><div class="input-wrap"><input id="repairRise" type="number" data-field min="-20" max="30" step="0.5" value="2"><span class="unit">%/年</span></div></div>
+              <div class="field"><label for="otherRise">その他維持費の上昇率</label><div class="input-wrap"><input id="otherRise" type="number" data-field min="-20" max="30" step="0.5" value="0"><span class="unit">%/年</span></div></div>
+            </div>
+            <p class="hint">「その他」は管理費・駐車場・自宅設備積立・その他月額・保険に適用します。税金は入力額を据え置きます。上昇率は予測ではなく仮定です。</p>
+          </div>
+        </details>
+        <details class="card section-card">
+          <summary><span class="step">06</span><span class="sec-label"><b>追加オプション</b><span>ボーナス時の繰上げ返済・家賃・年収</span></span><svg class="chevron" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></summary>
+          <div class="sec-content"><div class="fields">
+            <div class="field wide"><label for="extraBonus">ボーナス時の追加繰上げ返済 <span class="optional">任意</span></label><div class="input-wrap"><input id="extraBonus" type="number" data-field min="0" max="100000" step="1" value="0"><span class="unit">万円/回</span></div><span class="field-hint">年2回（6・12か月目から）、毎月返済額を変えず返済期間を短縮するモデル。通常の「ボーナス併用ローン」とは異なります。</span></div>
+            <div class="field"><label for="rent">現在の家賃 <span class="optional">任意</span></label><div class="input-wrap"><input id="rent" type="number" data-field min="0" max="1000" step="0.5" value="0"><span class="unit">万円/月</span></div></div>
+            <div class="field"><label for="income">世帯年収（額面） <span class="optional">任意</span></label><div class="input-wrap"><input id="income" type="number" data-field min="0" max="100000" step="10" value="0"><span class="unit">万円/年</span></div></div>
+          </div><p class="hint">現在の家賃と年収はシミュレーション補助にのみ利用し、共有リンクには含めません。</p></div>
+        </details>
+      </div>
+      <section class="results" aria-label="計算結果">
+        <div class="results-head"><h2>シミュレーション結果</h2><span class="meta" id="activeType">変動金利 / 35年</span></div>
+        <div id="validationError" class="error" role="alert"></div>
+        <div class="hero-result">
+          <div class="result-kicker">初年度の月平均住居費 <span style="font-weight:400">（ローン＋維持費＋追加返済）</span></div>
+          <div class="big-number"><span id="monthlyMan">—</span><span>万円 / 月</span></div>
+          <div class="exact" id="monthlyExact">—</div>
+          <div class="result-tag" id="regularMonth">通常月の支払額：—</div>
+        </div>
+        <div class="two-summary">
+          <div class="metric"><div class="metric-label">必要な初期現金</div><strong id="cashRequired">—</strong><div class="metric-sub" id="cashSub">頭金 + 諸費用 + 引越し</div></div>
+          <div class="metric"><div class="metric-label">ローン借入額</div><strong id="loanAmount">—</strong><div class="metric-sub" id="loanSub">返済期間 —</div></div>
+        </div>
+        <div class="card details-card">
+          <div class="details-head"><h3>初年度・月平均の内訳</h3><span>一時費用を除く</span></div>
+          <div class="total-line"><span class="lbl">合計</span><strong id="breakdownTotal">—</strong></div>
+          <div class="bar" id="breakdownBar" aria-label="月額費用の構成比"></div>
+          <div class="legends" id="breakdownLegend"></div>
+          <p class="explain" id="extraInfo" style="display:none"></p>
+        </div>
+        <div class="card chart-card">
+          <div class="details-head"><h3>返済・維持費の推移</h3><div class="chart-tabs" role="group" aria-label="グラフ切替"><button type="button" data-chart="cost" class="active" aria-pressed="true">月額負担</button><button type="button" data-chart="balance" aria-pressed="false">ローン残高</button></div></div>
+          <svg id="mainChart" viewBox="0 0 740 277" role="img" aria-label="年間の月額負担推移" xmlns="http://www.w3.org/2000/svg"></svg>
+          <div class="chart-bottom"><span id="chartNote">ローンと維持費の月平均（1年ごと）</span><span>単位：万円</span></div>
+        </div>
+        <div class="card table-card">
+          <div class="details-head"><h3>年次スナップショット</h3><span>名目額 / 概算</span></div>
+          <div class="table-scroll"><table><thead><tr><th>返済開始から</th><th>月平均住居費</th><th>年末の金利</th><th>ローン残高</th></tr></thead><tbody id="yearRows"></tbody></table></div>
+          <div class="calced" style="margin-top:13px"><span>ローンの累計支払利息</span><strong id="totalInterest">—</strong></div>
+          <div class="calced" style="margin-top:7px"><span>試算期間の総支出 <span style="font-size:10px">（初期費用を含む）</span></span><strong id="grandTotal">—</strong></div>
+          <div id="balloonAlert" class="alert is-hidden"></div>
+          <div id="rentResult" class="alert is-hidden" style="background:#f3f9f9;border-color:#d7e8e7;color:#3c6669"></div>
+          <div id="incomeResult" class="explain is-hidden"></div>
+        </div>
+        <div class="card table-card">
+          <div class="details-head"><h3>金利タイプの比較</h3><span>同じ物件・借入条件</span></div>
+          <div class="comparison" id="rateCompare"></div>
+          <p class="explain">全期間固定と変動金利の入力値を比較します。変動金利には設定した上昇シナリオを反映します。初年度月平均に維持費を含みます。</p>
+          <div id="stressArea" style="margin-top:17px">
+            <div class="details-head"><h3>変動金利の追加ストレステスト</h3><span>指定の上昇開始年から</span></div>
+            <div class="table-scroll"><table><thead><tr><th>金利シナリオ</th><th>最大の月平均負担</th><th>累計支払利息</th></tr></thead><tbody id="stressRows"></tbody></table></div>
+            <p class="explain">基本シナリオに対し、上昇開始年から金利がさらに +1 / +2%ポイント高くなる想定です（設定した上限金利も同幅引き上げ）。将来を予測するものではありません。</p>
+          </div>
+          <div class="actions"><button type="button" class="btn primary" id="csvBtn">年次データをCSV保存</button><button type="button" class="btn" id="shareBtn">条件の共有リンクをコピー</button></div>
+        </div>
+        <div class="assumptions"><b>計算上のご注意</b><p>ローンは毎月の概算計算で、元利均等は金利見直し時点の残高・残期間から返済額を再計算します。ボーナス時の追加返済は繰上げ返済（期間短縮型）として扱います。初年度の月平均は、年内の追加返済分も12か月で按分しています。</p><p>購入関連費用・融資手数料は重複しないよう入力してください。固定資産税・保険料は月額換算です。住宅ローン控除、税軽減の適用判定、売却価格、借換え、金利・積立金の実際の改定、住宅の資産価値は考慮していません。正確な資金計画は金融機関等の見積書で確認してください。</p></div>
+      </section>
+    </div>
+  </main>
+  <footer><div class="wrap">住まいのお金シミュレーター · 計算はブラウザ内で実行 · 入力した値はこの端末のブラウザに保存されます<br>参考：<a href="https://www.sbishinseibank.co.jp/retail/housing/column/vol72.html" target="_blank" rel="noopener noreferrer">変動金利の5年・125%ルールについて</a> / <a href="https://docs.github.com/ja/pages/getting-started-with-github-pages/creating-a-github-pages-site" target="_blank" rel="noopener noreferrer">GitHub Pages</a></div></footer>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script>
+(function () {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const inputIds = ['propertyType','price','down','interestType','term','repayment','rateVariable','rateFixed','rateIntro','introYears','postRate','riseYear','riseStep','riseCap','fiveYearRule','purchaseFeePct','loanFeePct','loanFeeFixed','movingCost','financeFees','management','repairFund','parking','selfRepair','annualTax','annualIns','miscMonthly','repairRise','otherRise','extraBonus','rent','income'];
+  const flagIds = new Set(['fiveYearRule','financeFees']);
+  const textIds = new Set(['propertyType','interestType','repayment']);
+  const defaultValues = {};
+  for (const id of inputIds) defaultValues[id] = flagIds.has(id) ? $(id).checked : $(id).value;
+  const storageKey = 'sumai-calculator-v1';
+  const nformat = new Intl.NumberFormat('ja-JP', {maximumFractionDigits:0});
+  let chartType='cost', latest=null, toastTimer=null, saveTimer=null;
+  const round = n => Math.round(Number.isFinite(n) ? n : 0);
+  const yen = n => nformat.format(round(n)) + '円';
+  const man = (n, digits=1) => { const x = (Number.isFinite(n) ? n : 0) / 10000; return x.toLocaleString('ja-JP', {minimumFractionDigits:digits, maximumFractionDigits:digits}) + '万円'; };
+  const manShort = n => {const x=(Number.isFinite(n)?n:0)/1e4; return x.toLocaleString('ja-JP',{maximumFractionDigits:x>=1000?0:1})+'万円';};
+  const pct = (n,d=1) => Number(n).toFixed(d) + '%';
+  const safeNum = id => Number($(id).value || 0);
+  function readInput(){const o={}; for(const id of inputIds) o[id]=flagIds.has(id)?$(id).checked:(textIds.has(id)?$(id).value:safeNum(id)); return o;}
+  function writeInput(values){for(const id of inputIds){if(!(id in values))continue;const el=$(id);if(flagIds.has(id))el.checked=values[id]===true||values[id]==='true'||values[id]==='1';else el.value=values[id];} }
+  function persist(){try{localStorage.setItem(storageKey, JSON.stringify(readInput()));}catch(e){/* 保存不可でも計算は継続 */}}
+  function restore(){
+    const params=new URLSearchParams(location.search);
+    if(params.get('sim')==='1'){
+      // 共有リンクはブラウザの保存値と混ぜず、初期値から再現する。
+      writeInput(defaultValues);
+      const urlVals={};
+      for(const id of inputIds){if(id==='income'||id==='rent')continue;if(params.has(id))urlVals[id]=params.get(id);}
+      writeInput(urlVals);
+    }else{
+      try{const raw=localStorage.getItem(storageKey);if(raw){const v=JSON.parse(raw);if(v&&typeof v==='object')writeInput(v);}}catch(e){}
+    }
+  }
+  function toast(message){const el=$('toast');el.textContent=message;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),3400);}
+  function payment(principal, annualPct, remainMonths){if(principal<=0||remainMonths<=0)return 0;const r=annualPct/1200;if(Math.abs(r)<1e-12)return principal/remainMonths;return principal*r/(-Math.expm1(-remainMonths*Math.log1p(r)));}
+  function prep(config){const c={...config};
+    const price=c.price*10000, down=c.down*10000, fixedFee=c.loanFeeFixed*10000, closingOther=price*c.purchaseFeePct/100, bankPct=c.loanFeePct/100;
+    const base=Math.max(0,price-down);
+    const borrow=c.financeFees ? (base+closingOther+fixedFee)/(1-bankPct) : base;
+    const bankFee=borrow*bankPct+fixedFee, moving=c.movingCost*10000;
+    const cash=down+moving+(c.financeFees?0:closingOther+bankFee);
+    return {c,price,down,borrow,bankFee,closingOther,moving,cash,initialFees:closingOther+bankFee+moving,months:c.term*12};
+  }
+  function annualRate(c, month, forcedType=null, stress=0){
+    const kind=forcedType||c.interestType;
+    if(kind==='fixed')return c.rateFixed;
+    if(kind==='intro')return month<=c.introYears*12 ? c.rateIntro : c.postRate;
+    const yearsElapsed=Math.floor((month-1)/12);
+    const steps=Math.max(0,yearsElapsed-c.riseYear+1);
+    const rising=c.rateVariable+c.riseStep*steps;
+    const base=c.riseStep>=0?Math.min(c.riseCap,rising):Math.max(c.riseCap,rising);
+    const shock=yearsElapsed>=c.riseYear?stress:0;
+    return Math.max(0,base+shock);
+  }
+  function operating(c, m){
+    const y=Math.floor((m-1)/12);
+    const annualGrowth=Math.pow(1+c.otherRise/100,y);
+    const fundGrowth=Math.pow(1+c.repairRise/100,y);
+    const repair=c.repairFund*fundGrowth;
+    const taxes=c.annualTax*10000/12;
+    const other=(c.management+c.parking+c.selfRepair+c.miscMonthly+c.annualIns*10000/12)*annualGrowth;
+    return {repair, taxes, other, total:repair+taxes+other};
+  }
+  function simulate(prepared, forcedType=null, stress=0){
+    const c=prepared.c, N=prepared.months, type=forcedType||c.interestType;
+    const rule=c.fiveYearRule&&type==='variable'&&c.repayment==='equal';
+    let bal=prepared.borrow, deferred=0, sched=0, oldAnnual=null;
+    const principalInstall=N>0?prepared.borrow/N:0;
+    const months=[], years=[];
+    let totalInterest=0, totalLoanCash=0, totalOperating=0, totalExtra=0, totalBalloon=0, payoffMonth=bal<=0?0:null;
+    for(let m=1;m<=N;m++){
+      const ar=annualRate(c,m,type,stress), rm=ar/1200, remaining=N-m+1;
+      if(c.repayment==='equal' && bal>0){
+        const rateChanged=oldAnnual===null||Math.abs(oldAnnual-ar)>1e-10;
+        if(m===1) sched=payment(bal,ar,remaining);
+        else if(rule){if((m-1)%60===0){const required=payment(bal,ar,remaining);sched=Math.min(required,sched*1.25);}}
+        else if(rateChanged) sched=payment(bal,ar,remaining);
+      }
+      oldAnnual=ar;
+      let currentInterest=bal*rm;
+      let scheduledCash=0, bonusExtra=0, balloon=0, principalPaid=0;
+      if(bal>1e-8||deferred>1e-8){
+        let due=c.repayment==='equal'?sched:Math.min(bal,principalInstall)+currentInterest;
+        let appliedCurrent=Math.min(due,currentInterest);
+        deferred+=currentInterest-appliedCurrent;
+        let left=Math.max(0,due-appliedCurrent);
+        let appliedDeferred=Math.min(left,deferred);
+        deferred-=appliedDeferred;left-=appliedDeferred;
+        principalPaid=Math.min(bal,left); bal-=principalPaid;
+        scheduledCash=appliedCurrent+appliedDeferred+principalPaid;
+        if(m%6===0&&c.extraBonus>0&&bal>0){bonusExtra=Math.min(bal,c.extraBonus*10000);bal-=bonusExtra;principalPaid+=bonusExtra;}
+        if(m===N&&(bal>1e-7||deferred>1e-7)){
+          balloon=bal+deferred;principalPaid+=bal;bal=0;deferred=0;
+        }
+        if(bal<1e-7&&deferred<1e-7){bal=0;deferred=0;if(payoffMonth===null)payoffMonth=m;}
+      }
+      const running=operating(c,m);
+      const mortgageCash=scheduledCash+bonusExtra+balloon;
+      const total=mortgageCash+running.total;
+      const row={m,year:Math.ceil(m/12),rate:ar,principal:principalPaid,interest:currentInterest,scheduledCash,bonusExtra,balloon,mortgageCash,repair:running.repair,other:running.other,taxes:running.taxes,running:running.total,total,balance:bal};
+      months.push(row);
+      totalInterest+=currentInterest;totalLoanCash+=mortgageCash;totalOperating+=running.total;totalExtra+=bonusExtra;totalBalloon+=balloon;
+      const yearIndex=Math.floor((m-1)/12);
+      if(!years[yearIndex])years[yearIndex]={year:yearIndex+1,cash:0,loan:0,run:0,interest:0,principal:0,balloon:0,bonus:0,rate:ar,balance:bal,repair:0,other:0,taxes:0};
+      const y=years[yearIndex];y.cash+=total;y.loan+=mortgageCash;y.run+=running.total;y.interest+=currentInterest;y.principal+=principalPaid;y.balloon+=balloon;y.bonus+=bonusExtra;y.rate=ar;y.balance=bal;y.repair+=running.repair;y.other+=running.other;y.taxes+=running.taxes;
+    }
+    const first=years[0]||{cash:0,loan:0,run:0,repair:0,other:0,taxes:0};
+    const highest=Math.max(...years.map(y=>y.cash/12));
+    return {months,years,first,firstAverage:first.cash/12,highAverage:highest,totalInterest,totalLoanCash,totalOperating,totalExtra,totalBalloon,totalOutlay:prepared.cash+totalLoanCash+totalOperating,payoffMonth,borrow:prepared.borrow,prepared};
+  }
+  function validate(c){
+    for(const id of inputIds){if(flagIds.has(id)||textIds.has(id))continue;const el=$(id),n=c[id];if(!Number.isFinite(n)||el.value===''||(el.min!==''&&n<Number(el.min))||(el.max!==''&&n>Number(el.max)))return '入力値を確認してください：「'+(document.querySelector('label[for="'+id+'"]')?.textContent.trim()||id)+'」が有効な範囲ではありません。';}
+    if(c.down>c.price)return '頭金は物件価格以下にしてください。';
+    if(c.introYears>=c.term&&c.interestType==='intro')return '当初固定期間は返済期間より短く設定してください。';
+    if(c.riseStep>=0&&c.riseCap<c.rateVariable&&c.interestType==='variable')return '上限金利は変動金利の初期値以上に設定してください。';
+    if(c.riseStep<0&&c.riseCap>c.rateVariable&&c.interestType==='variable')return '金利低下シナリオでは上限金利欄を下限として使います。初期金利以下に設定してください。';
+    if(c.financeFees&&c.loanFeePct>=100)return 'ローン事務手数料は100%未満にしてください。';
+    return null;
+  }
+  function addText(id,value){$(id).textContent=value;}
+  function setVisibility(c){
+    for(const el of document.querySelectorAll('[data-show]'))el.classList.toggle('is-hidden',el.dataset.show!==c.interestType);
+    $('interestSettings').classList.toggle('is-hidden',c.interestType!=='variable');
+    const rule=$('fiveYearRule');rule.disabled=c.interestType!=='variable'||c.repayment!=='equal';
+    for(const btn of document.querySelectorAll('[data-property]')){const active=btn.dataset.property===c.propertyType;btn.classList.toggle('active',active);btn.setAttribute('aria-pressed',String(active));}
+  }
+  function renderBreakdown(result,c){
+    const first=result.months.slice(0,12), total=result.firstAverage;
+    const groups=[
+      {name:'住宅ローン返済',value:first.reduce((s,r)=>s+r.scheduledCash,0)/12,color:'#47bec1'},
+      {name:'管理・修繕・その他',value:first.reduce((s,r)=>s+r.repair+r.other,0)/12,color:'#a2baf5'},
+      {name:'固定資産税など',value:first.reduce((s,r)=>s+r.taxes,0)/12,color:'#f1bc70'},
+      {name:'追加繰上げ返済',value:first.reduce((s,r)=>s+r.bonusExtra,0)/12,color:'#d19acb'},
+      {name:'満期の一括精算',value:first.reduce((s,r)=>s+r.balloon,0)/12,color:'#eb7d75'},
+    ].filter(g=>g.value>0.01);
+    $('breakdownBar').innerHTML='';$('breakdownLegend').innerHTML='';
+    for(const g of groups){const bar=document.createElement('div');bar.style.background=g.color;bar.style.width=(total?g.value/total*100:0)+'%';bar.title=g.name+'：'+yen(g.value);$('breakdownBar').appendChild(bar);
+      const item=document.createElement('div');item.className='legend';const sw=document.createElement('i');sw.className='swatch';sw.style.background=g.color;
+      const txt=document.createElement('div');const lbl=document.createElement('span');lbl.textContent=g.name;const val=document.createElement('strong');val.textContent=yen(g.value);txt.append(lbl,val);item.append(sw,txt);$('breakdownLegend').appendChild(item);
+    }
+  }
+  function renderChart(result){
+    const svg=$('mainChart'), yres=result.years;
+    const W=740,H=277, left=77,top=18,right=16,bottom=35, ww=W-left-right, hh=H-top-bottom;
+    const mode=chartType, isCost=mode==='cost';
+    let max=isCost?Math.max(1,...yres.map(y=>y.cash/12)) : Math.max(1,result.borrow);
+    max=Math.ceil(max/10000*1.16/5)*5*10000;
+    if(max<=0)max=10000;
+    const x=i=>left+(i+.5)*ww/yres.length;
+    const y=n=>top+hh-Math.max(0,n)/max*hh;
+    let svgText='';
+    for(let i=0;i<=4;i++){
+      const value=max*i/4,yy=y(value);
+      svgText+=`<line x1="${left}" y1="${yy.toFixed(2)}" x2="${W-right}" y2="${yy.toFixed(2)}" stroke="#e8eef2" stroke-width="1"/>`;
+      svgText+=`<text x="${left-10}" y="${(yy+4).toFixed(2)}" text-anchor="end" font-size="11" fill="#8293a1">${(value/10000).toLocaleString('ja-JP',{maximumFractionDigits:0})}</text>`;
+    }
+    if(isCost){
+      const barW=Math.max(4,Math.min(18,ww/yres.length*.66));
+      for(let i=0;i<yres.length;i++){
+        const a=yres[i], monthRun=a.run/12, monthLoan=a.loan/12;
+        const baseY=y(0), runY=y(monthRun), fullY=y(monthRun+monthLoan);
+        svgText+=`<g><title>${a.year}年目｜ローン月平均 ${yen(monthLoan)}・維持費月平均 ${yen(monthRun)}・合計 ${yen(monthRun+monthLoan)}</title>`;
+        svgText+=`<rect x="${(x(i)-barW/2).toFixed(2)}" y="${runY.toFixed(2)}" width="${barW.toFixed(2)}" height="${Math.max(0,baseY-runY).toFixed(2)}" fill="#b6ccd9" rx="1"/>`;
+        svgText+=`<rect x="${(x(i)-barW/2).toFixed(2)}" y="${fullY.toFixed(2)}" width="${barW.toFixed(2)}" height="${Math.max(0,runY-fullY).toFixed(2)}" fill="#188e96" rx="1"/></g>`;
+      }
+    }else{
+      const pts=yres.map((a,i)=>[x(i),y(a.balance)]);
+      const polygon=`${x(0)},${y(0)} `+pts.map(([a,b])=>`${a},${b}`).join(' ')+` ${x(yres.length-1)},${y(0)}`;
+      svgText+=`<polygon points="${polygon}" fill="#d9eff1" fill-opacity=".7"/>`;
+      svgText+=`<polyline points="${pts.map(([a,b])=>`${a},${b}`).join(' ')}" stroke="#178b93" stroke-width="3" fill="none" stroke-linejoin="round" stroke-linecap="round"/>`;
+      pts.forEach(([xx,yy],i)=>{svgText+=`<circle cx="${xx}" cy="${yy}" r="${yres.length>40?2:2.6}" fill="#1b8e94"><title>${i+1}年目：残高${manShort(yres[i].balance)}</title></circle>`;});
+    }
+    const valid=new Set([0,yres.length-1]);for(let i=4;i<yres.length;i+=5)valid.add(i);
+    for(const i of [...valid].sort((a,b)=>a-b))svgText+=`<text x="${x(i).toFixed(2)}" y="${H-10}" text-anchor="middle" font-size="11" fill="#8293a1">${i+1}年</text>`;
+    svg.innerHTML=svgText;
+    svg.setAttribute('aria-label',isCost?'ローン支払額と維持費の年次月平均棒グラフ':'毎年末ローン残高の推移グラフ');
+    $('chartNote').textContent=isCost?'■ ローン返済（濃） / ■ 維持費（淡）、毎年の月平均':'年末時点のローン残高（追加返済・最終精算反映）';
+    for(const btn of document.querySelectorAll('[data-chart]')){const active=btn.dataset.chart===chartType;btn.classList.toggle('active',active);btn.setAttribute('aria-pressed',String(active));}
+  }
+  function renderTable(result,c){
+    $('yearRows').innerHTML='';
+    const indices=new Set([1,5,10,20,30,c.term].filter(n=>n<=c.term));
+    for(const i of [...indices].sort((a,b)=>a-b)){
+      const y=result.years[i-1];if(!y)continue;
+      const tr=document.createElement('tr');
+      const cells=[i+'年目',man(y.cash/12),pct(y.rate,2),manShort(y.balance)];
+      cells.forEach(t=>{const cell=document.createElement('td');cell.textContent=t;tr.appendChild(cell);});$('yearRows').appendChild(tr);
+    }
+    addText('totalInterest',manShort(result.totalInterest));
+    addText('grandTotal',manShort(result.totalOutlay));
+    const balloon=$('balloonAlert');balloon.classList.toggle('is-hidden',result.totalBalloon<1);
+    if(result.totalBalloon>=1)balloon.textContent='注意：返済額の上限などによって満期に残高・未払利息が発生するため、最終回に '+manShort(result.totalBalloon)+' を一括精算する仮定で計算しました。金融機関の実際の扱いとは異なる場合があります。';
+    const rent=$('rentResult');rent.classList.toggle('is-hidden',!(c.rent>0));
+    if(c.rent>0){const diff=result.firstAverage-c.rent*10000;rent.textContent='現在の家賃 '+man(c.rent*10000)+' / 月との差：購入後の初年度月平均は '+(diff>=0?'約'+man(diff)+' 高い':'約'+man(-diff)+' 低い')+' 見込みです。比較は現金支出のみで、購入後の資産価値や賃貸更新費用などは含めません。';}
+    const inc=$('incomeResult');inc.classList.toggle('is-hidden',!(c.income>0));
+    if(c.income>0)inc.textContent='世帯年収（額面）に対する初年度の年間住居費の割合：約 '+pct(result.firstAverage*12/(c.income*10000)*100)+'。家計の手取り額・他の借入・教育費等も別途考慮してください。';
+  }
+  function renderCompare(prepared){
+    const a=simulate(prepared,'variable'),b=simulate(prepared,'fixed');
+    const box=$('rateCompare');box.innerHTML='';
+    for(const item of [{name:'変動金利',rate:prepared.c.rateVariable,color:'#199a9a',result:a},{name:'全期間固定',rate:prepared.c.rateFixed,color:'#6879bd',result:b}]){
+      const col=document.createElement('div');
+      const typ=document.createElement('div');typ.className='type';const dot=document.createElement('i');dot.style.background=item.color;typ.append(dot,document.createTextNode(item.name+' '+pct(item.rate,2)));
+      const big=document.createElement('div');big.className='c-big';big.textContent=man(item.result.firstAverage);
+      const sm=document.createElement('div');sm.className='c-sub';sm.textContent='初年度の月平均住居費';
+      const ft=document.createElement('div');ft.className='c-foot';ft.append(document.createTextNode('総支払利息'),document.createTextNode(manShort(item.result.totalInterest)));
+      col.append(typ,big,sm,ft);box.appendChild(col);
+    }
+    $('stressRows').innerHTML='';
+    for(const s of [0,1,2]){
+      const r=s===0?a:simulate(prepared,'variable',s);const tr=document.createElement('tr');
+      for(const val of [s?'追加 +'+s+'%pt':'基本シナリオ',man(r.highAverage),manShort(r.totalInterest)]){const td=document.createElement('td');td.textContent=val;tr.appendChild(td);}
+      $('stressRows').appendChild(tr);
+    }
+  }
+  function run(){
+    const c=readInput();setVisibility(c);
+    const err=validate(c);const error=$('validationError');error.textContent=err||'';error.classList.toggle('show',!!err);
+    if(err){latest=null;return;}
+    const prepared=prep(c),r=simulate(prepared);latest={c,prepared,r};
+    addText('activeType',({'variable':'変動金利','fixed':'全期間固定','intro':'当初固定'})[c.interestType]+' / '+c.term+'年');
+    addText('downRatio',pct(c.down/c.price*100));addText('feesPreview',manShort(prepared.initialFees));
+    addText('monthlyMan',(r.firstAverage/1e4).toLocaleString('ja-JP',{minimumFractionDigits:1,maximumFractionDigits:1}));
+    addText('monthlyExact','月額換算 '+yen(r.firstAverage)+' ｜ 1年目の合計 '+manShort(r.first.cash));
+    addText('regularMonth','通常月の支払額（追加返済なし）：'+yen(r.months[0]?.scheduledCash+r.months[0]?.running||0));
+    addText('cashRequired',manShort(prepared.cash));
+    addText('cashSub',c.financeFees?'頭金 + 引越し費（諸費用は借入）':'頭金 + 諸費用 + 引越し');
+    addText('loanAmount',manShort(prepared.borrow));
+    addText('loanSub',(c.financeFees?'諸費用借入あり / ':'')+(r.payoffMonth&&r.payoffMonth<prepared.months?'繰上げで約'+(r.payoffMonth/12).toFixed(1)+'年で完済':'返済期間 '+c.term+'年'));
+    addText('breakdownTotal',yen(r.firstAverage));
+    renderBreakdown(r,c);
+    $('extraInfo').style.display=c.extraBonus>0?'block':'none';
+    $('extraInfo').textContent=c.extraBonus>0?'年2回の追加繰上げ返済を初年度の月平均に含めています。通常月の支払いは上段の値をご覧ください。':'';
+    renderChart(r);renderTable(r,c);renderCompare(prepared);
+  }
+  function scheduleRun(){clearTimeout(saveTimer);saveTimer=setTimeout(()=>{run();persist();},120);}
+  function exportCSV(){if(!latest){toast('入力値を確認してください');return;}
+    const {r}=latest;
+    const rows=[['年目','月平均住居費（円）','ローン月平均（円）','維持費月平均（円）','年間の支払利息（円）','年間の繰上げ返済（円）','年間の満期精算（円）','年末金利（%）','年末ローン残高（円）']];
+    for(const y of r.years)rows.push([y.year,round(y.cash/12),round(y.loan/12),round(y.run/12),round(y.interest),round(y.bonus),round(y.balloon),Number(y.rate.toFixed(4)),round(y.balance)]);
+    rows.push(['合計','','','',round(r.totalInterest),round(r.totalExtra),round(r.totalBalloon),'','']);
+    const csv='\ufeff'+rows.map(row=>row.map(v=>'"'+String(v).replaceAll('"','""')+'"').join(',')).join('\r\n');
+    const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});const url=URL.createObjectURL(blob),a=document.createElement('a');
+    a.href=url;a.download='sumai_simulation.csv';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),3000);toast('CSVファイルを保存しました');
+  }
+  async function share(){if(!latest){toast('入力値を確認してください');return;}
+    if(location.protocol==='file:'){toast('GitHub Pages公開後に共有リンクを使えます');return;}
+    const params=new URLSearchParams();params.set('sim','1');const v=readInput();
+    for(const id of inputIds){if(id==='income'||id==='rent')continue;const val=flagIds.has(id)?(v[id]?'1':'0'):String(v[id]);if(val!==String(defaultValues[id]))params.set(id,val);}
+    const link=location.origin+location.pathname+(params.size?'?'+params.toString():'');
+    try{await navigator.clipboard.writeText(link);toast('共有リンクをコピーしました（年収・家賃は除外）');}
+    catch(e){window.prompt('共有リンクをコピーしてください（年収・家賃は除外）',link);}
+  }
+  for(const id of inputIds){const el=$(id);el.addEventListener(el.tagName==='SELECT'||flagIds.has(id)?'change':'input',scheduleRun);}
+  for(const btn of document.querySelectorAll('[data-chart]'))btn.addEventListener('click',()=>{chartType=btn.dataset.chart;if(latest)renderChart(latest.r);});
+  for(const btn of document.querySelectorAll('[data-property]'))btn.addEventListener('click',()=>{
+    const type=btn.dataset.property;const last=$('propertyType').value;if(type===last)return;
+    $('propertyType').value=type;
+    if(type==='house'){$('management').value=0;$('repairFund').value=0;$('selfRepair').value=20000;}
+    else{$('management').value=15000;$('repairFund').value=18000;$('selfRepair').value=5000;}
+    run();persist();toast('維持費の参考初期値を変更しました。実際の金額をご確認ください');
+  });
+  $('resetBtn').addEventListener('click',()=>{if(!window.confirm('すべての入力を初期値に戻しますか？'))return;writeInput(defaultValues);history.replaceState(null,'',location.pathname);run();persist();toast('初期値に戻しました');});
+  $('csvBtn').addEventListener('click',exportCSV);
+  $('shareBtn').addEventListener('click',share);
+  restore();run();
+  window.__sumaiSimulator={payment,prep,annualRate,operating,simulate,validate,readInput};
+})();
+</script>
+</body>
+</html>
