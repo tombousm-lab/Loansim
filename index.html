@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f6f8fb">
-  <meta name="description" content="住宅ローンの支払いと購入・賃貸の正味負担を比較。売却時の物件残価やローン残債、インフレ連動の家賃上昇を試算。">
+  <meta name="description" content="住宅ローン・購入と賃貸の比較。初期金融資産のオルカン運用と月々の差額積立、物件売却時の残価、1980〜1990年の家賃上昇も試算。">
   <title>住まいのお金シミュレーター | 購入・賃貸の比較と住宅ローン</title>
   <style>
     :root { --bg:#f5f7fb; --paper:#ffffff; --ink:#18283c; --sub:#5c6e80; --muted:#8190a0; --border:#e2e8f0; --brand:#176d75; --brand-dark:#0e5259; --brand-light:#e6f5f2; --blue:#5166b4; --amber:#b9792c; --red:#b54e49; --teal:#13a0a0; --shadow:0 12px 35px rgba(24,40,60,.06); }
@@ -151,6 +151,17 @@
     @media(max-width:790px) { .layout { grid-template-columns:minmax(0,1fr); gap:20px; } .results { position:static; } .input-stack { order:0; } .results { order:1; } .intro { padding:25px 0 20px; } .header-right .privately { display:none; } .big-number { font-size:46px; } }
     @media(max-width:480px) { .wrap { width:calc(100% - 26px); } .topbar { min-height:64px; } .brand { font-size:13px; gap:8px; } .brandmark { width:31px; height:31px; } .header-right { gap:5px; } .mini-action { padding:8px; font-size:11px; } .intro h1 { font-size:29px; } .intro p { font-size:12px; } .fields { column-gap:9px; } details.section-card summary { padding:16px; } .sec-content { padding:0 16px 18px; } .big-number { font-size:39px; } .hero-result { padding:20px; } .two-summary { gap:8px; } .metric { padding:12px; } .metric strong { font-size:20px; } .details-card,.chart-card,.table-card { padding:16px; } .comparison { gap:8px; } .comparison > div { padding:10px; } .comparison .c-big { font-size:17px; } .actions .btn { flex:1; } }
 
+    /* 1980年代の家賃実績シナリオ */
+    .history-brief { margin-top:13px; border:1px solid #e3e8ee; border-radius:11px; padding:13px 14px; background:#fbfcfe; }
+    .history-brief strong { display:block; font-size:12px; margin-bottom:9px; }
+    .history-snapshot { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
+    .history-snapshot > div { border-right:1px solid #e8edf2; padding-right:6px; }
+    .history-snapshot > div:last-child { border:0; }
+    .history-snapshot span { display:block; font-size:10px; color:#667988; }
+    .history-snapshot b { display:block; font-size:16px; letter-spacing:-.03em; color:#166f77; }
+    .history-brief .hint { margin-top:9px; }
+    .history-brief a { text-underline-offset:2px; }
+
     /* 購入・賃貸の長期比較 */
     .buy-rent-card { padding:21px 23px 22px; }
     .buy-rent-card .heading-years { color:var(--brand); font-size:inherit; }
@@ -174,6 +185,17 @@
     .chart-legend-row span { display:flex; gap:7px; align-items:center; }
     .chart-legend-row i { display:inline-block; }
     @media(max-width:480px) { .buy-rent-card { padding:16px; } .compare-tiles { gap:8px; } .compare-tile { padding:11px; } .compare-facts { column-gap:9px; } .compare-facts > div { display:block; } .compare-facts span,.compare-facts strong { display:block; } .compare-facts strong { margin-top:2px; } .comparison-lead { font-size:19px; } }
+    /* 初期金融資産・オルカン運用を組み込んだ資産比較 */
+    .investment-card { padding:21px 23px 22px; border-color:#cfe5e2; }
+    .investment-lead { font-size:clamp(17px,2.2vw,24px); font-weight:830; letter-spacing:-.035em; line-height:1.5; margin:15px 0 5px; }
+    .investment-lead strong { color:#136a71; }
+    .investment-tiles { margin-top:16px; }
+    .investment-note { background:#f1f7f7; color:#477078; padding:11px 12px; border-radius:10px; font-size:11px; line-height:1.7; margin-top:13px; }
+    .investment-card .compare-name { font-size:11px; }
+    .investment-card .compare-facts { margin-top:5px; }
+    .charts-3tabs { flex-wrap:wrap; }
+    .charts-3tabs button { white-space:nowrap; }
+    @media(max-width:480px) { .investment-card { padding:16px; } .investment-lead { font-size:18px; } .charts-3tabs button { padding:5px 6px; font-size:10px; } }
     @media print { body { background:white; } .site-header,.input-stack,.actions,.chart-tabs,footer { display:none!important; } .layout { display:block; } .results { position:static; } .card,.hero-result { box-shadow:none; } .wrap { width:100%; } .hero-result { print-color-adjust:exact; -webkit-print-color-adjust:exact; } }
   </style>
 </head>
@@ -191,8 +213,8 @@
     <div class="intro">
       <div class="eyebrow"><span class="line"></span> HOME FINANCE PLANNER <span class="line"></span></div>
       <h1>その家、<em>買う？ 借りる？</em></h1>
-      <p>住宅ローンと毎月の維持費に加え、将来の売却価格・残債・家賃のインフレ上昇まで考慮。「何年間住むか」を揃えて、購入と賃貸の正味コストを比較できます。</p>
-      <div class="intro-links"><a href="#inputs">条件を入力する ↓</a><a href="#buyRentCard">比較結果を見る →</a></div>
+      <p>住宅ローン・家賃上昇・物件の残価に加え、頭金や初期費用を払った後の金融資産を「オルカン」で運用。購入と賃貸の将来資産を同じ期間・同じ家計予算で比較します。</p>
+      <div class="intro-links"><a href="#inputs">条件を入力する ↓</a><a href="#investmentCard">オルカン比較を見る →</a><a href="#buyRentCard">住居費だけの比較 →</a></div>
     </div>
     <noscript><div class="noscript">このツールにはJavaScriptが必要です。ブラウザのJavaScriptを有効にしてください。</div></noscript>
     <div class="layout">
@@ -288,14 +310,44 @@
               <div class="field"><label for="rentParking">駐車場・駐輪場</label><div class="input-wrap"><input id="rentParking" type="number" data-field min="0" max="100" step="0.5" value="0"><span class="unit">万円/月</span></div></div>
               <div class="field"><label for="rentOtherMonthly">その他月額費用</label><div class="input-wrap"><input id="rentOtherMonthly" type="number" data-field min="0" max="100" step="0.5" value="0"><span class="unit">万円/月</span></div></div>
             </div>
-            <hr class="dividing"><div class="block-label">家賃上昇とインフレ</div>
+            <hr class="dividing"><div class="block-label">家賃上昇シナリオ</div>
             <div class="fields" style="margin-top:9px">
-              <div class="field"><label for="inflationRate">物価上昇率（想定）</label><div class="input-wrap"><input id="inflationRate" type="number" data-field min="-10" max="20" step="0.5" value="2"><span class="unit">%/年</span></div></div>
-              <div class="field"><label for="rentInflationPass">家賃への転嫁率</label><div class="input-wrap"><input id="rentInflationPass" type="number" data-field min="0" max="200" step="10" value="100"><span class="unit">%</span></div><span class="field-hint">100%なら物価2%上昇時、家賃も約2%上昇</span></div>
-              <div class="field"><label for="rentRealRise">家賃固有の変動率</label><div class="input-wrap"><input id="rentRealRise" type="number" data-field min="-20" max="20" step="0.5" value="0"><span class="unit">%/年</span></div><span class="field-hint">立地・需給などによる追加の値上がり／値下がり</span></div>
-              <div class="field"><label for="rentFeeRise">共益費などの上昇率</label><div class="input-wrap"><input id="rentFeeRise" type="number" data-field min="-20" max="20" step="0.5" value="0"><span class="unit">%/年</span></div></div>
+              <div class="field wide"><label for="rentModel">家賃上昇のモデル</label><select id="rentModel" data-field>
+                <option value="manual" selected>任意の物価・家賃上昇率で試算（標準）</option>
+                <option value="history">1980〜1990年の日本の民営家賃実績を再現</option>
+              </select><span class="field-hint">歴史モードは1980〜1990年の指数変化を最初の10年間に適用します。11年目以降は別の率を指定できます。</span></div>
+              <div class="field wide"><label for="rentTiming">家賃を変更するタイミング</label><select id="rentTiming" data-field>
+                <option value="annual">毎年改定（指数どおりに計算）</option>
+                <option value="renewal" selected>契約更新時のみ（更新周期ごとに改定）</option>
+              </select><span class="field-hint">「更新時のみ」は、指定した更新年にその時点の想定家賃へ変更するモデルです。実際に値上げできることを保証するものではありません。</span></div>
             </div>
-            <div class="formula-note"><span class="notice-dot">ⓘ</span><span>家賃は「物価上昇率 × 転嫁率」と家賃固有の変動率を年1回複利で反映します。実際の賃料改定は契約・交渉・市場環境で異なります。</span></div>
+            <div id="rentManualBlock">
+              <div class="block-label">任意の家賃上昇率（物価連動）</div>
+              <div class="fields" style="margin-top:9px">
+                <div class="field"><label for="inflationRate">物価上昇率（想定）</label><div class="input-wrap"><input id="inflationRate" type="number" data-field min="-10" max="20" step="0.5" value="2"><span class="unit">%/年</span></div></div>
+                <div class="field"><label for="rentInflationPass">家賃への転嫁率</label><div class="input-wrap"><input id="rentInflationPass" type="number" data-field min="0" max="200" step="5" value="25"><span class="unit">%</span></div><span class="field-hint">初期値は物価2% × 転嫁25% → 家賃の年0.5%上昇</span></div>
+                <div class="field"><label for="rentRealRise">家賃固有の変動率</label><div class="input-wrap"><input id="rentRealRise" type="number" data-field min="-20" max="20" step="0.5" value="0"><span class="unit">%/年</span></div><span class="field-hint">立地・需給などによる追加の値上がり／値下がり</span></div>
+              </div>
+            </div>
+            <div id="rentHistoryBlock" class="is-hidden">
+              <div class="history-brief">
+                <strong>日本のインフレ期：1980 → 1990年（全国の年平均指数）</strong>
+                <div class="history-snapshot">
+                  <div><span>総合物価（10年間）</span><b>+22.4%</b></div>
+                  <div><span>民営家賃（10年間）</span><b>+33.8%</b></div>
+                  <div><span>民営家賃の年平均</span><b>約3.0%</b></div>
+                </div>
+                <p class="hint">民営家賃指数は1980年69.0 → 1990年92.3。10年間の年ごとの上昇率を使用し、物価連動の設定とは重複させません。指数は個々の賃貸契約の賃料改定履歴ではありません。</p>
+                <p class="hint">出典：<a href="https://www.e-stat.go.jp/stat-search/files?stat_infid=000040482831" target="_blank" rel="noopener noreferrer">総務省・消費者物価指数（e-Stat）</a> ／ <a href="https://opengov.jp/en/prices/cpi/housing/rent/private-rent/" target="_blank" rel="noopener noreferrer">民営家賃の指数一覧</a> ／ <a href="https://www5.cao.go.jp/keizai3/2022/0203nk/n22_7_data05.html" target="_blank" rel="noopener noreferrer">内閣府・総合物価</a></p>
+              </div>
+              <div class="fields" style="margin-top:12px">
+                <div class="field wide"><label for="rentHistoryAfter">1980〜1990年相当の10年間が終わった後の上昇率</label><div class="input-wrap"><input id="rentHistoryAfter" type="number" data-field min="-20" max="20" step="0.1" value="0.5"><span class="unit">%/年</span></div><span class="field-hint">過去の約3%を35年間続けるのではなく、10年後は別のペースに変更します（初期値0.5%）。</span></div>
+              </div>
+            </div>
+            <div class="fields" style="margin-top:11px">
+              <div class="field wide"><label for="rentFeeRise">共益費などの上昇率（両モデル共通）</label><div class="input-wrap"><input id="rentFeeRise" type="number" data-field min="-20" max="20" step="0.5" value="0"><span class="unit">%/年</span></div></div>
+            </div>
+            <div class="formula-note"><span class="notice-dot">ⓘ</span><span>民営家賃の指数は全国の平均的な実績です。同じ物件に住み続ける際の値上げや、新規募集家賃を直接表すものではありません。1980年代の物件価格・金利の動きは自動反映しないため、購入側も別途シナリオを設定してください。</span></div>
             <hr class="dividing"><div class="block-label">契約時・更新時の費用</div>
             <div class="fields" style="margin-top:9px">
               <div class="field"><label for="rentDepositMonths">敷金</label><div class="input-wrap"><input id="rentDepositMonths" type="number" data-field min="0" max="12" step="0.5" value="1"><span class="unit">家賃の月数</span></div></div>
@@ -326,6 +378,21 @@
             <div class="formula-note"><span class="notice-dot">ⓘ</span><span>比較終了時に自宅を仮に売却し、想定売却価格から売却費用と住宅ローン残債を引いた金額を「手取り資産」として評価します。実際には売却しない場合も比較のために売却を仮定します。</span></div>
           </div>
         </details>
+        <details class="card section-card" open>
+          <summary><span class="step">09</span><span class="sec-label"><b>初期資産・オルカン運用</b><span>頭金・初期費用を差し引いた残額を投資</span></span><svg class="chevron" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></summary>
+          <div class="sec-content">
+            <p class="hint">購入と賃貸の<strong>両方に同じ初期金融資産</strong>があると想定します。購入では頭金・現金支払い諸費用を、賃貸では入居時費用を差し引き、残りを全世界株式（オルカン）に一括投資します。</p>
+            <div class="fields" style="margin-top:13px">
+              <div class="field wide"><label for="initialAssets">初期金融資産（頭金も含む総額）</label><div class="input-wrap"><input id="initialAssets" type="number" data-field min="0" max="100000" step="100" value="2000"><span class="unit">万円</span></div><span class="field-hint">頭金・購入諸費用・敷金などを支払う前の総額。両案で共通です。</span></div>
+              <div class="field"><label for="investmentReturn">オルカンの想定名目リターン</label><div class="input-wrap"><input id="investmentReturn" type="number" data-field min="-50" max="30" step="0.5" value="4"><span class="unit">%/年</span></div><span class="field-hint">円建て・投資信託の運用費用控除後・税引前の仮定。4%は将来予測ではありません。</span></div>
+              <div class="field"><label for="investmentTax">売却時の運用益税率</label><div class="input-wrap"><input id="investmentTax" type="number" data-field min="0" max="50" step="0.001" value="20.315"><span class="unit">%</span></div><span class="field-hint">課税口座の参考値20.315%。0%は完全非課税の簡略モデルです。</span></div>
+            </div>
+            <label class="checkline"><input id="investMonthlyGap" type="checkbox" data-field checked><span><strong>住居費が安い側は、毎月の差額もオルカンへ積立</strong><br><span class="field-hint">両案とも「その月の高い方の住居費」を同じ予算とし、余った側が差額を投資。比較条件を揃えるため初期値はON。</span></span></label>
+            <div class="calced"><span>購入後のオルカン初期投資額</span><strong id="ownerInitialInvest">—</strong></div>
+            <div class="calced" style="margin-top:7px"><span>賃貸開始後のオルカン初期投資額</span><strong id="renterInitialInvest">—</strong></div>
+            <div class="formula-note"><span class="notice-dot">ⓘ</span><span>初期費用を払っても必要な生活防衛資金が残るよう、初期金融資産・頭金を設定してください。このモデルは余剰額を全額投資し、株価・為替の変動、元本割れリスクを年間一定率で単純化しています。税率0%でもNISAの年間360万円・非課税保有限度額1,800万円の制約は再現しません。</span></div>
+          </div>
+        </details>
       </div>
       <section class="results" aria-label="計算結果">
         <div class="results-head"><h2>シミュレーション結果</h2><span class="meta" id="activeType">変動金利 / 35年</span></div>
@@ -340,8 +407,29 @@
           <div class="metric"><div class="metric-label">必要な初期現金</div><strong id="cashRequired">—</strong><div class="metric-sub" id="cashSub">頭金 + 諸費用 + 引越し</div></div>
           <div class="metric"><div class="metric-label">ローン借入額</div><strong id="loanAmount">—</strong><div class="metric-sub" id="loanSub">返済期間 —</div></div>
         </div>
+        <div class="card investment-card" id="investmentCard">
+          <div class="details-head"><h3>オルカン運用を含む最終純資産｜<span id="investYearsHeading">10年</span>後</h3><span>株式・住宅を終了時点で売却した場合</span></div>
+          <div id="investmentLead" class="investment-lead" aria-live="polite">試算中…</div>
+          <p class="explain" id="investmentExplain">同じ初期資産から購入・賃貸の初期費用を払い、残額を運用した場合の比較です。</p>
+          <div class="compare-tiles investment-tiles">
+            <div class="compare-tile owning"><div class="compare-name"><i></i>購入の最終純資産</div><strong id="ownerWealth">—</strong><span>オルカン税引後評価額＋売却手取り</span></div>
+            <div class="compare-tile renting"><div class="compare-name"><i></i>賃貸の最終純資産</div><strong id="renterWealth">—</strong><span>オルカン税引後評価額＋敷金返還</span></div>
+          </div>
+          <div class="compare-facts">
+            <div><span>購入：オルカン初期投資</span><strong id="ownerInvestSeed">—</strong></div>
+            <div><span>賃貸：オルカン初期投資</span><strong id="renterInvestSeed">—</strong></div>
+            <div><span>購入：差額の追加積立累計</span><strong id="ownerInvestExtra">—</strong></div>
+            <div><span>賃貸：差額の追加積立累計</span><strong id="renterInvestExtra">—</strong></div>
+            <div><span>購入：オルカン税引後評価額</span><strong id="ownerInvestNet">—</strong></div>
+            <div><span>賃貸：オルカン税引後評価額</span><strong id="renterInvestNet">—</strong></div>
+            <div><span>購入：投資利益への想定課税</span><strong id="ownerInvestTax">—</strong></div>
+            <div><span>賃貸：投資利益への想定課税</span><strong id="renterInvestTax">—</strong></div>
+          </div>
+          <p class="investment-note" id="investmentBudgetNote">同じ月の住居費予算を使い、住居費が安い側のみ差額を投資しています。</p>
+          <p class="explain">投資額は「初期金融資産－購入/賃貸の初期現金費用」です。運用利益がプラスなら、比較終了時に全額売却したとして設定した税率を運用益にのみ課税します。住宅の売却時は既存の売却費用とローン残債を控除しています。投資の実際の値動き、NISAの枠、住宅譲渡益への税金は再現していません。</p>
+        </div>
         <div class="card buy-rent-card" id="buyRentCard">
-          <div class="details-head"><h3>購入 vs 賃貸｜<span id="compareYearsHeading" class="heading-years">10年</span>住んだ場合</h3><span>累積正味コスト・名目額</span></div>
+          <div class="details-head"><h3>住居費のみの比較｜<span id="compareYearsHeading" class="heading-years">10年</span>間</h3><span>投資の運用益は除く</span></div>
           <div class="comparison-lead" id="comparisonLead" aria-live="polite" aria-atomic="true">試算中…</div>
           <p class="explain" id="comparisonExplain">購入側は売却してローンを清算した場合の手取り資産を差し引き、賃貸側は敷金返還を差し引いています。</p>
           <div class="compare-tiles">
@@ -360,19 +448,19 @@
           </div>
           <div id="pvResult" class="calced is-hidden" style="margin-top:14px"><span id="pvLabel">現在価値で比較</span><strong id="pvValue">—</strong></div>
           <div id="negativeEquityAlert" class="alert is-hidden"></div>
-          <p class="explain compare-footnote">物件価値は年率複利で推計します。「売却後の手取り資産」がマイナスの場合は、その額の持ち出しが必要という意味です。税制優遇・譲渡所得税・家賃以外の生活費・運用益は計算に含めません。</p>
+          <p class="explain compare-footnote">物件価値は年率複利で推計します。「売却後の手取り資産」がマイナスの場合は、その額の持ち出しが必要という意味です。税制優遇・譲渡所得税・家賃以外の生活費・運用益はこの「住居費のみ」の比較に含めません。</p>
         </div>
         <div class="card chart-card">
-          <div class="details-head"><h3>購入と賃貸の長期推移</h3><div class="chart-tabs" role="group" aria-label="比較グラフ切替"><button type="button" data-rentchart="net" class="active" aria-pressed="true">累積正味負担</button><button type="button" data-rentchart="monthly" aria-pressed="false">月平均支出</button></div></div>
-          <svg id="rentBuyChart" viewBox="0 0 740 285" role="img" aria-label="購入と賃貸の長期費用比較" xmlns="http://www.w3.org/2000/svg"></svg>
+          <div class="details-head"><h3>購入と賃貸の長期推移</h3><div class="chart-tabs charts-3tabs" role="group" aria-label="比較グラフ切替"><button type="button" data-rentchart="wealth" class="active" aria-pressed="true">最終純資産</button><button type="button" data-rentchart="net" aria-pressed="false">累積正味負担</button><button type="button" data-rentchart="monthly" aria-pressed="false">月平均支出</button></div></div>
+          <svg id="rentBuyChart" viewBox="0 0 740 285" role="img" aria-label="購入と賃貸の最終純資産比較" xmlns="http://www.w3.org/2000/svg"></svg>
           <div class="chart-legend-row"><span><i style="background:#178c94"></i>購入</span><span><i style="background:#6879bd"></i>賃貸</span></div>
-          <div class="chart-bottom"><span id="rentBuyChartNote">比較各年末で売却した場合の累積正味負担</span><span>単位：万円</span></div>
-          <p class="explain" style="padding:0 4px">累積正味負担は各年末に売却・退去する仮定です。月平均支出はその年の現金支払いで、購入時の頭金・初期費用や売却手取りは含みません。</p>
+          <div class="chart-bottom"><span id="rentBuyChartNote">各年末の税引後投資残高＋売却手取り／敷金返還</span><span>単位：万円</span></div>
+          <p class="explain" style="padding:0 4px">純資産は各年末に株式と住宅を売却・賃貸を退去すると仮定した金額です。住居費の安い側は月額差額を追加投資（設定ONの場合）。月平均支出には初期費用・積立投資を含めません。</p>
         </div>
         <div class="card table-card">
           <div class="details-head"><h3>比較期間ごとの内訳</h3><span>各年末時点・名目額</span></div>
-          <div class="table-scroll"><table><thead><tr><th>居住期間</th><th>購入の正味負担</th><th>賃貸の正味負担</th><th>想定売却価格</th><th>ローン残債</th></tr></thead><tbody id="compareRows"></tbody></table></div>
-          <p class="explain">差額はその時点で住み替えたと仮定した結果です。価格・賃料・金利などの前提を変えて複数のシナリオを検討してください。</p>
+          <div class="table-scroll"><table><thead><tr><th>居住期間</th><th>購入の最終純資産</th><th>賃貸の最終純資産</th><th>購入の正味負担</th><th>賃貸の正味負担</th><th>想定売却価格</th><th>ローン残債</th></tr></thead><tbody id="compareRows"></tbody></table></div>
+          <p class="explain">最終純資産は投資残高を想定税率で売却し、住宅も売却・賃貸も退去したと仮定した結果です。毎月差額の積立をOFFにすると、日々の住居費負担の違いが最終資産に反映されません。</p>
         </div>
         <div class="card details-card">
           <div class="details-head"><h3>初年度・月平均の内訳</h3><span>一時費用を除く</span></div>
@@ -403,9 +491,9 @@
             <div class="table-scroll"><table><thead><tr><th>金利シナリオ</th><th>最大の月平均負担</th><th>累計支払利息</th></tr></thead><tbody id="stressRows"></tbody></table></div>
             <p class="explain">基本シナリオに対し、上昇開始年から金利がさらに +1 / +2%ポイント高くなる想定です（設定した上限金利も同幅引き上げ）。将来を予測するものではありません。</p>
           </div>
-          <div class="actions"><button type="button" class="btn primary" id="csvBtn">住宅ローン・賃貸比較をCSV保存</button><button type="button" class="btn" id="shareBtn">条件の共有リンクをコピー</button></div><p class="explain">共有リンクには家賃・物件価格などの入力条件が含まれます。年収は含まれません。</p>
+          <div class="actions"><button type="button" class="btn primary" id="csvBtn">住宅ローン・賃貸・投資比較をCSV保存</button><button type="button" class="btn" id="shareBtn">条件の共有リンクをコピー</button></div><p class="explain">共有リンクには家賃・物件価格・<strong>初期金融資産</strong>などの条件が含まれます（コピー前に確認あり）。年収は含まれません。</p>
         </div>
-        <div class="assumptions"><b>計算上のご注意</b><p>ローンは毎月の概算計算で、元利均等は金利見直し時点の残高・残期間から返済額を再計算します。ボーナス時の追加返済は繰上げ返済（期間短縮型）として扱います。初年度の月平均は、年内の追加返済分も12か月で按分しています。</p><p>購入関連費用・融資手数料は重複しないよう入力してください。固定資産税・保険料は月額換算です。購入・賃貸比較では将来の売却価格・家賃増減を入力仮定から推計し、売却費用・残債・賃貸初期費用・敷金返還を考慮しています。住宅ローン控除や税軽減、譲渡所得税、買い替え費用、運用益、設備更新の実際の工事時期は個別に確認してください。自宅修繕用の積立は予算上の支出として扱い、未使用残高は資産に戻していません。</p></div>
+        <div class="assumptions"><b>計算上のご注意</b><p>ローンは毎月の概算計算で、元利均等は金利見直し時点の残高・残期間から返済額を再計算します。ボーナス時の追加返済は繰上げ返済（期間短縮型）として扱います。初年度の月平均は、年内の追加返済分も12か月で按分しています。</p><p>購入関連費用・融資手数料は重複しないよう入力してください。固定資産税・保険料は月額換算です。購入・賃貸比較では将来の売却価格・家賃増減を入力仮定から推計し、売却費用・残債・賃貸初期費用・敷金返還を考慮しています。住宅ローン控除や税軽減、譲渡所得税、買い替え費用、投資の実際の値動きと費用・NISAの枠、設備更新の実際の工事時期は個別に確認してください。自宅修繕用の積立は予算上の支出として扱い、未使用残高は資産に戻していません。</p><p>オルカンは実際のファンド収益を予測するものではなく、年率一定の円建て名目リターンを仮定しています。<a href="https://faq1.am.mufg.jp/answer/67205ae7228f77a9e4a501a8/" target="_blank" rel="noopener noreferrer">株価・為替により元本を割り込む可能性</a>があります。税率は任意の一律仮定で、<a href="https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1476.htm" target="_blank" rel="noopener noreferrer">特定口座での譲渡益課税</a>を参考にしています。<a href="https://www.nta.go.jp/users/gensen/nisa/pdf/shinnisa.pdf" target="_blank" rel="noopener noreferrer">NISAの投資枠</a>や配当の個別課税は自動再現しません。</p></div>
       </section>
     </div>
   </main>
@@ -415,14 +503,14 @@
 (function () {
   'use strict';
   const $ = id => document.getElementById(id);
-  const inputIds = ['propertyType','price','down','interestType','term','repayment','rateVariable','rateFixed','rateIntro','introYears','postRate','riseYear','riseStep','riseCap','fiveYearRule','purchaseFeePct','loanFeePct','loanFeeFixed','movingCost','financeFees','management','repairFund','parking','selfRepair','annualTax','annualIns','miscMonthly','repairRise','otherRise','extraBonus','rent','rentMaintenance','rentParking','rentOtherMonthly','inflationRate','rentInflationPass','rentRealRise','rentFeeRise','rentDepositMonths','rentDepositReturn','rentKeyMoneyMonths','rentAgencyMonths','rentGuarantee','rentMoving','rentInsuranceAnnual','rentRenewYears','rentRenewFeeMonths','holdYears','propertyGrowth','saleFeePct','saleFeeFixed','saleMiscCost','discountRate','income'];
-  const flagIds = new Set(['fiveYearRule','financeFees']);
-  const textIds = new Set(['propertyType','interestType','repayment']);
+  const inputIds = ['propertyType','price','down','interestType','term','repayment','rateVariable','rateFixed','rateIntro','introYears','postRate','riseYear','riseStep','riseCap','fiveYearRule','purchaseFeePct','loanFeePct','loanFeeFixed','movingCost','financeFees','management','repairFund','parking','selfRepair','annualTax','annualIns','miscMonthly','repairRise','otherRise','extraBonus','rent','rentMaintenance','rentParking','rentOtherMonthly','rentModel','rentTiming','inflationRate','rentInflationPass','rentRealRise','rentHistoryAfter','rentFeeRise','rentDepositMonths','rentDepositReturn','rentKeyMoneyMonths','rentAgencyMonths','rentGuarantee','rentMoving','rentInsuranceAnnual','rentRenewYears','rentRenewFeeMonths','holdYears','propertyGrowth','saleFeePct','saleFeeFixed','saleMiscCost','discountRate','initialAssets','investmentReturn','investmentTax','investMonthlyGap','income'];
+  const flagIds = new Set(['fiveYearRule','financeFees','investMonthlyGap']);
+  const textIds = new Set(['propertyType','interestType','repayment','rentModel','rentTiming']);
   const defaultValues = {};
   for (const id of inputIds) defaultValues[id] = flagIds.has(id) ? $(id).checked : $(id).value;
   const storageKey = 'sumai-calculator-v1';
   const nformat = new Intl.NumberFormat('ja-JP', {maximumFractionDigits:0});
-  let chartType='cost', rentChartType='net', latest=null, toastTimer=null, saveTimer=null;
+  let chartType='cost', rentChartType='wealth', latest=null, toastTimer=null, saveTimer=null;
   const round = n => Math.round(Number.isFinite(n) ? n : 0);
   const yen = n => nformat.format(round(n)) + '円';
   const man = (n, digits=1) => { const x = (Number.isFinite(n) ? n : 0) / 10000; return x.toLocaleString('ja-JP', {minimumFractionDigits:digits, maximumFractionDigits:digits}) + '万円'; };
@@ -434,14 +522,19 @@
   function persist(){try{localStorage.setItem(storageKey, JSON.stringify(readInput()));}catch(e){/* 保存不可でも計算は継続 */}}
   function restore(){
     const params=new URLSearchParams(location.search);
-    if(params.get('sim')==='1'){
+    if(params.get('sim')==='1'||params.get('sim')==='2'){
       // 共有リンクはブラウザの保存値と混ぜず、初期値から再現する。
       writeInput(defaultValues);
+      // 旧バージョンの共有リンクは年2%・毎年改定が既定だったため、旧初期値を再現。
+      if(params.get('sim')==='1')writeInput({rentModel:'manual',rentTiming:'annual',rentInflationPass:100});
       const urlVals={};
       for(const id of inputIds){if(id==='income')continue;if(params.has(id))urlVals[id]=params.get(id);}
       writeInput(urlVals);
     }else{
-      try{const raw=localStorage.getItem(storageKey);if(raw){const v=JSON.parse(raw);if(v&&typeof v==='object'){if(!('rentMaintenance' in v)&&Number(v.rent)===0)v.rent=defaultValues.rent;writeInput(v);}}}catch(e){}
+      try{const raw=localStorage.getItem(storageKey);if(raw){const v=JSON.parse(raw);if(v&&typeof v==='object'){if(!('rentMaintenance' in v)&&Number(v.rent)===0)v.rent=defaultValues.rent;
+          if(!('rentTiming' in v))v.rentTiming='annual'; // 旧バージョンの計算方法を維持。
+          if(!('rentModel' in v))v.rentModel='manual';
+          writeInput(v);}}}catch(e){}
     }
   }
   function toast(message){const el=$('toast');el.textContent=message;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),3400);}
@@ -525,6 +618,10 @@
     for(const id of inputIds){if(flagIds.has(id)||textIds.has(id))continue;const el=$(id),n=c[id];if(!Number.isFinite(n)||el.value===''||(el.min!==''&&n<Number(el.min))||(el.max!==''&&n>Number(el.max)))return '入力値を確認してください：「'+(document.querySelector('label[for="'+id+'"]')?.textContent.trim()||id)+'」が有効な範囲ではありません。';}
     if(!Number.isInteger(c.term)||!Number.isInteger(c.holdYears)||!Number.isInteger(c.rentRenewYears))return '返済期間・比較する居住期間・賃貸更新周期は整数年で入力してください。';
     if(c.down>c.price)return '頭金は物件価格以下にしてください。';
+    const pp=prep(c);
+    const rentalInitial=(c.rent*10000)*(c.rentDepositMonths+c.rentKeyMoneyMonths+c.rentAgencyMonths)+(c.rentGuarantee+c.rentMoving)*10000;
+    if(c.initialAssets*10000+1e-7<pp.cash || c.initialAssets*10000+1e-7<rentalInitial)
+      return '初期金融資産が開始時の現金支払いに不足しています。購入：'+manShort(pp.cash)+'／賃貸：'+manShort(rentalInitial)+'が必要です。初期金融資産や頭金を調整してください。';
     if(c.introYears>=c.term&&c.interestType==='intro')return '当初固定期間は返済期間より短く設定してください。';
     if(c.riseStep>=0&&c.riseCap<c.rateVariable&&c.interestType==='variable')return '上限金利は変動金利の初期値以上に設定してください。';
     if(c.riseStep<0&&c.riseCap>c.rateVariable&&c.interestType==='variable')return '金利低下シナリオでは上限金利欄を下限として使います。初期金利以下に設定してください。';
@@ -535,8 +632,24 @@
   function setVisibility(c){
     for(const el of document.querySelectorAll('[data-show]'))el.classList.toggle('is-hidden',el.dataset.show!==c.interestType);
     $('interestSettings').classList.toggle('is-hidden',c.interestType!=='variable');
+    $('rentManualBlock').classList.toggle('is-hidden',c.rentModel==='history');
+    $('rentHistoryBlock').classList.toggle('is-hidden',c.rentModel!=='history');
     const rule=$('fiveYearRule');rule.disabled=c.interestType!=='variable'||c.repayment!=='equal';
     for(const btn of document.querySelectorAll('[data-property]')){const active=btn.dataset.property===c.propertyType;btn.classList.toggle('active',active);btn.setAttribute('aria-pressed',String(active));}
+  }
+  // 総務省CPI・全国民営家賃、年平均指数（2020年=100への接続指数）。
+  // 1980〜1990年の「各年の変化率」を再現する。将来の予測値ではない。
+  const historicPrivateRent = [69.0,72.0,74.7,77.3,79.2,81.1,83.2,85.2,88.0,90.0,92.3];
+  function rentFactorAtYear(c, yearIndex){
+    // 更新時のみ改定する場合は、その時点の水準に2年等の間隔で追いつくと仮定。
+    const effectiveYear=c.rentTiming==='renewal' ? Math.floor(yearIndex/c.rentRenewYears)*c.rentRenewYears : yearIndex;
+    if(c.rentModel==='history'){
+      const last=historicPrivateRent.length-1;
+      return effectiveYear<=last ? historicPrivateRent[effectiveYear]/historicPrivateRent[0]
+        : historicPrivateRent[last]/historicPrivateRent[0]*Math.pow(1+c.rentHistoryAfter/100,effectiveYear-last);
+    }
+    const manualGrowth=(1+c.inflationRate/100*c.rentInflationPass/100)*(1+c.rentRealRise/100);
+    return Math.pow(manualGrowth,effectiveYear);
   }
   // 同じ居住期間での購入・賃貸比較。双方の初期キャッシュアウトと毎月費用を積算し、
   // 毎年末に売却または退去した場合の正味コストを比較する。
@@ -549,11 +662,17 @@
     const rentInitial=initialDeposit+firstRent*(c.rentKeyMoneyMonths+c.rentAgencyMonths)+(c.rentGuarantee+c.rentMoving)*10000;
     const discMonthly=Math.pow(1+c.discountRate/100,1/12);
     let ownerTotal=prepared.cash, renterTotal=rentInitial;
+    const firstFunds=c.initialAssets*10000;
+    const seedOwner=firstFunds-prepared.cash, seedRenter=firstFunds-rentInitial;
+    let ownerFund=seedOwner, renterFund=seedRenter;
+    let ownerInvestedPrincipal=seedOwner, renterInvestedPrincipal=seedRenter;
+    let ownerGapInvested=0, renterGapInvested=0;
+    const monthlyInvestmentGrowth=Math.pow(1+c.investmentReturn/100,1/12);
     let ownerPV=prepared.cash, renterPV=rentInitial;
     let annualOwner=0, annualRenter=0, lastRegularRent=0, lastBaseRent=firstRent;
     const years=[];
     for(let m=1;m<=H;m++){
-      const yearIndex=Math.floor((m-1)/12), growth=Math.pow(rentGrowth,yearIndex);
+      const yearIndex=Math.floor((m-1)/12), growth=rentFactorAtYear(c,yearIndex);
       const rentBase=firstRent*growth;
       const recurringFees=(c.rentMaintenance+c.rentParking+c.rentOtherMonthly)*10000*Math.pow(feeGrowth,yearIndex);
       const regularRent=rentBase+recurringFees+c.rentInsuranceAnnual*10000/12;
@@ -563,6 +682,14 @@
       const loanMonth=m<=prepared.months ? mortgage.months[m-1] : null;
       const ownerCash=loanMonth?loanMonth.total:operating(c,m).total;
       ownerTotal+=ownerCash; renterTotal+=renterCash;
+      // 同じ月の住居費予算を想定し、安い側だけ差額を月末に積立。
+      // 毎月の現金支出が等しくなるため、投資残高+住宅持分を比較できる。
+      const ownerGap=c.investMonthlyGap?Math.max(0,renterCash-ownerCash):0;
+      const renterGap=c.investMonthlyGap?Math.max(0,ownerCash-renterCash):0;
+      ownerFund=ownerFund*monthlyInvestmentGrowth+ownerGap;
+      renterFund=renterFund*monthlyInvestmentGrowth+renterGap;
+      ownerInvestedPrincipal+=ownerGap;renterInvestedPrincipal+=renterGap;
+      ownerGapInvested+=ownerGap;renterGapInvested+=renterGap;
       const disc=Math.pow(discMonthly,m);
       ownerPV+=ownerCash/disc; renterPV+=renterCash/disc;
       annualOwner+=ownerCash; annualRenter+=renterCash;
@@ -574,23 +701,50 @@
         const loanOwed=loanMonth?loanMonth.balance+loanMonth.deferred:0;
         const saleProceeds=saleValue-saleCosts-loanOwed;
         const ownerNet=ownerTotal-saleProceeds, renterNet=renterTotal-returnedDeposit;
+        const ownerTax=Math.max(0,ownerFund-ownerInvestedPrincipal)*c.investmentTax/100;
+        const renterTax=Math.max(0,renterFund-renterInvestedPrincipal)*c.investmentTax/100;
+        const ownerFundNet=ownerFund-ownerTax, renterFundNet=renterFund-renterTax;
+        const ownerWealth=ownerFundNet+saleProceeds, renterWealth=renterFundNet+returnedDeposit;
         const yearDiscount=Math.pow(discMonthly,m);
         years.push({year,saleValue,saleCosts,loanOwed,saleProceeds,ownerCash:ownerTotal,renterCash:renterTotal,ownerNet,renterNet,
           ownerPV:ownerPV-saleProceeds/yearDiscount,renterPV:renterPV-returnedDeposit/yearDiscount,
-          ownerMonthly:annualOwner/12,renterMonthly:annualRenter/12,regularRent:lastRegularRent,baseRent:lastBaseRent});
+          ownerMonthly:annualOwner/12,renterMonthly:annualRenter/12,regularRent:lastRegularRent,baseRent:lastBaseRent,
+          ownerFund, renterFund, ownerFundNet, renterFundNet, ownerTax, renterTax,
+          ownerGapInvested, renterGapInvested, ownerInvestedPrincipal, renterInvestedPrincipal, ownerWealth, renterWealth});
         annualOwner=0;annualRenter=0;
       }
     }
     const last=years[years.length-1];
     const firstBuyYear=years.find(v=>v.ownerNet<=v.renterNet);
-    return {years,last,firstBuyYear:firstBuyYear?firstBuyYear.year:null,initialRent:rentInitial,returnedDeposit,rentGrowth,firstRent};
+    const firstBuyWealthYear=years.find(v=>v.ownerWealth>=v.renterWealth);
+    return {years,last,firstBuyYear:firstBuyYear?firstBuyYear.year:null,firstBuyWealthYear:firstBuyWealthYear?firstBuyWealthYear.year:null,
+      initialRent:rentInitial,returnedDeposit,rentGrowth,firstRent,seedOwner,seedRenter};
+  }
+  function renderInvestment(comp,c){
+    const y=comp.last, difference=y.ownerWealth-y.renterWealth;
+    addText('investYearsHeading',String(c.holdYears)+'年');
+    addText('ownerInitialInvest',manShort(comp.seedOwner));addText('renterInitialInvest',manShort(comp.seedRenter));
+    addText('ownerInvestSeed',manShort(comp.seedOwner));addText('renterInvestSeed',manShort(comp.seedRenter));
+    addText('ownerInvestExtra',manShort(y.ownerGapInvested));addText('renterInvestExtra',manShort(y.renterGapInvested));
+    addText('ownerInvestNet',manShort(y.ownerFundNet));addText('renterInvestNet',manShort(y.renterFundNet));
+    addText('ownerInvestTax',manShort(y.ownerTax));addText('renterInvestTax',manShort(y.renterTax));
+    addText('ownerWealth',manShort(y.ownerWealth));addText('renterWealth',manShort(y.renterWealth));
+    const verdict=Math.abs(difference)<1000?'最終純資産はほぼ同じ':
+      (difference>0?'購入':'賃貸')+'の方が最終純資産は約'+manShort(Math.abs(difference))+'多い';
+    addText('investmentLead',verdict);
+    addText('investmentExplain','同じ初期金融資産'+manShort(c.initialAssets*10000)+'から頭金・現金諸費用（購入）または入居時費用（賃貸）を支払い、残金をオルカンで運用。年率'+pct(c.investmentReturn)+'・運用益課税率'+pct(c.investmentTax,3)+'の仮定で、'+c.holdYears+'年後の純資産を比較しています。');
+    addText('investmentBudgetNote',c.investMonthlyGap?
+      '毎月の比較：購入と賃貸のうち住居費が高い方を共通の月予算とし、安い方だけ差額を月末にオルカンへ積立。両案が同じ初期資産・同じ月予算を使う条件です。':
+      '注意：毎月の差額積立はOFFです。これは「最初の余剰資産だけを運用した場合」で、購入と賃貸の毎月の支出差は最終資産に反映されないため、純資産差だけで優劣を判断しないでください。');
   }
   function renderLongComparison(comp,c){
     const x=comp.last, diff=x.renterNet-x.ownerNet;
     addText('compareYearsHeading',String(c.holdYears)+'年');
     const lead=$('comparisonLead');lead.textContent= Math.abs(diff)<1000 ? '購入と賃貸の正味負担はほぼ同じ' :
       c.holdYears+'年間で'+(diff>0?'購入':'賃貸')+'が約'+manShort(Math.abs(diff))+'低コスト';
-    addText('comparisonExplain','同じ'+c.holdYears+'年間の累積支出から、購入は売却時の手取り、賃貸は敷金返還を引いて比較しています。家賃の想定年間上昇率：'+pct((comp.rentGrowth-1)*100,2)+'。');
+    const rentScenario=c.rentModel==='history'?'家賃は1980〜1990年の全国民営家賃の年別指数変化（10年間で+33.8%）を適用し、その後は年'+pct(c.rentHistoryAfter)+'で試算。':'家賃の長期的な想定上昇率は年'+pct((comp.rentGrowth-1)*100,2)+'。';
+    const timing=c.rentTiming==='renewal'?'実際の家賃改定は'+c.rentRenewYears+'年ごとの更新時だけと仮定。':'家賃は毎年改定すると仮定。';
+    addText('comparisonExplain','同じ'+c.holdYears+'年間の累積支出から、購入は売却時の手取り、賃貸は敷金返還を引いて比較しています。'+rentScenario+timing);
     addText('buyNet',manShort(x.ownerNet)); addText('rentNet',manShort(x.renterNet));
     addText('saleValue',manShort(x.saleValue));addText('loanBalanceAtSale',manShort(x.loanOwed));
     addText('sellingCosts',manShort(x.saleCosts));addText('saleNetEquity',manShort(x.saleProceeds));
@@ -608,7 +762,7 @@
     const milestones=new Set([1,3,5,10,15,20,25,30,35,40,45,50,c.holdYears].filter(v=>v<=c.holdYears));
     for(const n of [...milestones].sort((a,b)=>a-b)){
       const y=comp.years[n-1];const tr=document.createElement('tr');
-      for(const val of [n+'年',manShort(y.ownerNet),manShort(y.renterNet),manShort(y.saleValue),manShort(y.loanOwed)]){
+      for(const val of [n+'年',manShort(y.ownerWealth),manShort(y.renterWealth),manShort(y.ownerNet),manShort(y.renterNet),manShort(y.saleValue),manShort(y.loanOwed)]){
         const cell=document.createElement('td');cell.textContent=val;tr.appendChild(cell);
       }
       tbody.appendChild(tr);
@@ -617,7 +771,7 @@
   }
   function renderRentBuyChart(comp){
     const svg=$('rentBuyChart'), rows=comp.years, mode=rentChartType;
-    const aKey=mode==='net'?'ownerNet':'ownerMonthly',bKey=mode==='net'?'renterNet':'renterMonthly';
+    const aKey=mode==='wealth'?'ownerWealth':mode==='net'?'ownerNet':'ownerMonthly',bKey=mode==='wealth'?'renterWealth':mode==='net'?'renterNet':'renterMonthly';
     const W=740,H=285,left=75,top=24,right=17,bottom=35,ww=W-left-right,hh=H-top-bottom;
     const all=[0,...rows.flatMap(z=>[z[aKey],z[bKey]])];
     let min=Math.min(...all),max=Math.max(...all);
@@ -644,8 +798,8 @@
     const tags=new Set([0,rows.length-1]);for(let i=4;i<rows.length-1;i+=5)tags.add(i);
     for(const i of [...tags].sort((a,b)=>a-b))t+=`<text x="${safe(x(i))}" y="${H-10}" text-anchor="middle" font-size="11" fill="#8293a1">${i+1}年</text>`;
     svg.innerHTML=t;
-    svg.setAttribute('aria-label',mode==='net'?'購入と賃貸の累積正味コストの比較':'購入と賃貸の月平均支出の比較');
-    addText('rentBuyChartNote',mode==='net'?'各年末で売却・退去した場合の累積正味負担':'年ごとの月平均キャッシュアウト（購入・賃貸）');
+    svg.setAttribute('aria-label',mode==='wealth'?'購入と賃貸のオルカン運用を含む最終純資産比較':mode==='net'?'購入と賃貸の累積正味コストの比較':'購入と賃貸の月平均支出の比較');
+    addText('rentBuyChartNote',mode==='wealth'?'各年末の税引後オルカン＋売却手取り／敷金返還':mode==='net'?'各年末で売却・退去した場合の累積正味負担':'年ごとの月平均キャッシュアウト（購入・賃貸）');
     for(const btn of document.querySelectorAll('[data-rentchart]')){
       const active=btn.dataset.rentchart===mode;btn.classList.toggle('active',active);btn.setAttribute('aria-pressed',String(active));
     }
@@ -755,7 +909,7 @@
     renderBreakdown(r,c);
     $('extraInfo').style.display=c.extraBonus>0?'block':'none';
     $('extraInfo').textContent=c.extraBonus>0?'年2回の追加繰上げ返済を初年度の月平均に含めています。通常月の支払いは上段の値をご覧ください。':'';
-    renderLongComparison(comparison,c);renderChart(r);renderTable(r,c);renderCompare(prepared);
+    renderInvestment(comparison,c);renderLongComparison(comparison,c);renderChart(r);renderTable(r,c);renderCompare(prepared);
   }
   function scheduleRun(){clearTimeout(saveTimer);saveTimer=setTimeout(()=>{run();persist();},120);}
   function exportCSV(){if(!latest){toast('入力値を確認してください');return;}
@@ -765,21 +919,29 @@
     rows.push(['合計','','','',round(r.totalInterest),round(r.totalExtra),round(r.totalBalloon),'','']);
     rows.push([]);
     rows.push(['購入・賃貸の比較（名目額）']);
-    rows.push(['比較年数',c.holdYears,'物件価値の年変動率(%)',c.propertyGrowth,'物価上昇率(%)',c.inflationRate,'家賃のインフレ転嫁率(%)',c.rentInflationPass]);
+    rows.push(['比較年数',c.holdYears,'物件価値の年変動率(%)',c.propertyGrowth,'家賃モデル',c.rentModel==='history'?'1980-1990年の民営家賃実績':'任意の複利上昇率','改定時期',c.rentTiming==='renewal'?'契約更新時':'毎年']);
+    rows.push(['インフレ想定(%)',c.inflationRate,'家賃インフレ転嫁率(%)',c.rentInflationPass,'歴史モデル終了後の家賃上昇率(%)',c.rentHistoryAfter,'家賃固有の変動率(%)',c.rentRealRise]);
+    rows.push(['歴史モデル使用指数（全国民営家賃、1980〜1990年、年平均、2020年=100）',...historicPrivateRent]);
     rows.push(['賃貸初期費用（円）',round(comparison.initialRent),'敷金返還（円）',round(comparison.returnedDeposit)]);
-    rows.push(['居住年数','年間購入支出の月平均（円）','年間賃貸支出の月平均（円）','購入の累計現金支出（円）','賃貸の累計現金支出（円）','想定売却価格（円）','売却費用（円）','売却時ローン清算額（円）','売却手取り（円）','購入の正味負担（円）','賃貸の正味負担（円）','購入の現在価値（円）','賃貸の現在価値（円）']);
-    for(const y of comparison.years)rows.push([y.year,round(y.ownerMonthly),round(y.renterMonthly),round(y.ownerCash),round(y.renterCash),round(y.saleValue),round(y.saleCosts),round(y.loanOwed),round(y.saleProceeds),round(y.ownerNet),round(y.renterNet),round(y.ownerPV),round(y.renterPV)]);
+    rows.push(['オルカン投資の比較（円建て・名目・年率一定の仮定）']);
+    rows.push(['初期金融資産（円）',round(c.initialAssets*10000),'想定リターン(%)',c.investmentReturn,'売却時の運用益課税率(%)',c.investmentTax,'月額差額を積立',c.investMonthlyGap?'あり':'なし']);
+    rows.push(['購入の初期投資額（円）',round(comparison.seedOwner),'賃貸の初期投資額（円）',round(comparison.seedRenter)]);
+    rows.push(['比較終了時・購入の最終純資産（円）',round(comparison.last.ownerWealth),'賃貸の最終純資産（円）',round(comparison.last.renterWealth)]);
+    rows.push(['居住年数','年間購入支出の月平均（円）','年間賃貸支出の月平均（円）','年末の通常月の家賃合計（円）','年末の基本家賃（円）','購入の累計現金支出（円）','賃貸の累計現金支出（円）','想定売却価格（円）','売却費用（円）','売却時ローン清算額（円）','売却手取り（円）','購入の正味負担（円）','賃貸の正味負担（円）','購入の現在価値（円）','賃貸の現在価値（円）','購入のオルカン時価・税引前（円）','賃貸のオルカン時価・税引前（円）','購入のオルカン売却益課税（円）','賃貸のオルカン売却益課税（円）','購入のオルカン税引後（円）','賃貸のオルカン税引後（円）','購入の差額積立累計（円）','賃貸の差額積立累計（円）','購入の最終純資産（円）','賃貸の最終純資産（円）']);
+    for(const y of comparison.years)rows.push([y.year,round(y.ownerMonthly),round(y.renterMonthly),round(y.regularRent),round(y.baseRent),round(y.ownerCash),round(y.renterCash),round(y.saleValue),round(y.saleCosts),round(y.loanOwed),round(y.saleProceeds),round(y.ownerNet),round(y.renterNet),round(y.ownerPV),round(y.renterPV),round(y.ownerFund),round(y.renterFund),round(y.ownerTax),round(y.renterTax),round(y.ownerFundNet),round(y.renterFundNet),round(y.ownerGapInvested),round(y.renterGapInvested),round(y.ownerWealth),round(y.renterWealth)]);
     const csv='\ufeff'+rows.map(row=>row.map(v=>'"'+String(v).replaceAll('"','""')+'"').join(',')).join('\r\n');
     const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});const url=URL.createObjectURL(blob),a=document.createElement('a');
-    a.href=url;a.download='sumai_buy_rent_simulation.csv';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),3000);toast('CSVファイルを保存しました');
+    a.href=url;a.download='sumai_buy_rent_investment_simulation.csv';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),3000);toast('CSVファイルを保存しました');
   }
+  const cFormatter=n=>Number(n).toLocaleString('ja-JP',{maximumFractionDigits:1});
   async function share(){if(!latest){toast('入力値を確認してください');return;}
     if(location.protocol==='file:'){toast('GitHub Pages公開後に共有リンクを使えます');return;}
-    const params=new URLSearchParams();params.set('sim','1');const v=readInput();
+    if(!window.confirm('共有URLには初期金融資産（'+cFormatter(readInput().initialAssets)+'万円）や頭金などの入力値が含まれます。URLを知る人が金額を確認できます。続けますか？'))return;
+    const params=new URLSearchParams();params.set('sim','2');const v=readInput();
     for(const id of inputIds){if(id==='income')continue;const val=flagIds.has(id)?(v[id]?'1':'0'):String(v[id]);if(val!==String(defaultValues[id]))params.set(id,val);}
     const link=location.origin+location.pathname+(params.size?'?'+params.toString():'');
-    try{await navigator.clipboard.writeText(link);toast('共有リンクをコピーしました（年収は除外、家賃は含む）');}
-    catch(e){window.prompt('共有リンクをコピーしてください（年収除外・家賃を含む）',link);}
+    try{await navigator.clipboard.writeText(link);toast('共有リンクをコピーしました（初期金融資産を含む・年収は除外）');}
+    catch(e){window.prompt('共有リンクをコピーしてください（初期金融資産を含む・年収は除外）',link);}
   }
   for(const id of inputIds){const el=$(id);el.addEventListener(el.tagName==='SELECT'||flagIds.has(id)?'change':'input',scheduleRun);}
   for(const btn of document.querySelectorAll('[data-chart]'))btn.addEventListener('click',()=>{chartType=btn.dataset.chart;if(latest)renderChart(latest.r);});
@@ -795,7 +957,7 @@
   $('csvBtn').addEventListener('click',exportCSV);
   $('shareBtn').addEventListener('click',share);
   restore();run();
-  window.__sumaiSimulator={payment,prep,annualRate,operating,simulate,compareHold,validate,readInput};
+  window.__sumaiSimulator={payment,prep,annualRate,operating,simulate,compareHold,validate,readInput,rentFactorAtYear,historicPrivateRent};
 })();
 </script>
 </body>
